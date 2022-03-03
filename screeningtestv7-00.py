@@ -3,9 +3,8 @@
 # streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7-00.py"
 
 # TO DO
-
-# Solve the view documentaion problem. See the other todo doc.
-#  get help/about menu to show spaces. markdown is just eliminating all extra spaces.
+# - Solve the view documentaion problem. See the other todo doc.
+#   get help/about menu to show spaces. markdown is just eliminating all extra spaces.
 # - check results carefully.
 # - Add a slider for the prevint ?
 
@@ -29,7 +28,7 @@
 #   they are usually less reliable than commonly supposed.
 #
 # Inputs:
-#        A GUI invites the user to enter the following medical test statistics.
+#        A GUI asks the user to enter the following medical test statistics.
 #          Population: 
 #          Test Sensitivity:
 #          Test Specificity:
@@ -61,7 +60,7 @@
 
 import os
 import streamlit as st
-from streamlit import session_state as GUI
+from streamlit import session_state as Static
 import pandas as pd
 import matplotlib as mpl  
 
@@ -69,10 +68,13 @@ import matplotlib as mpl
 class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
     # +++ DETAILS ABOUT THIS MODULE
-    ThisModule_Version = "7_00     2022 March 3, 10.29 am EST."       
+    ThisModule_Project = "Medical Screen Tests Efficacy."
+    ThisModule_Version = "7_00     2022 March 3, 10.29 am EST."  
     ThisModule_About = "For a course Spring 2022. "  
     ThisModule_Author = "TB, UConn Math Dept."
-    ThisModule_Purpose = "To demonstrate the effect of disease prevalence on medical screening tests."
+    ThisModule_Purpose = ("To demonstrate the effect of disease prevalence " 
+                         "on medical screening tests.")
+    ThisModule_Contact = "Contacts not supplied."
     ThisModule_FullPath  = os.path.abspath(__file__)
     ThisModule_FileName = os.path.basename(ThisModule_FullPath)
     ThisModule_ProjectPath = os.path.dirname(ThisModule_FullPath)
@@ -83,7 +85,8 @@ class Global_Variables():  # A class creating all global variables.
     #   we have to use another cloud storage site, eg Google drive.
           
     # Program Help/Documentation.    
-    Link01 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/Resource_Project_Documentation.pdf"
+    Link01 = ("https://github.com/ProfBrockway/ScreeningTest/" 
+             "blob/main/Resource_Project_Documentation.pdf")
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
@@ -92,10 +95,12 @@ class Global_Variables():  # A class creating all global variables.
     Link20 = "https://youtu.be/DkpuAnnDjyo"
     # Name of downloaded table file
     Link40 = "ScreeningTestDataFrame.csv"
+    
+    Debug = None
     # +++ END OF RESOURCES AND OTHER LINKS OR VARIABLES THAT MIGHT CHANGE.
     ###########################################################################
  
-    # +++++    THE STATITICAL VARIABLES OF THE MEDICAL SCREENING TEST  ++++++++++
+    # ++++  THE STATITICAL VARIABLES OF THE MEDICAL SCREENING TEST  ++++++++++
 
     # ++ POPULATION SIZE: The number of people in the test data population.
     # PopulationSize = TP+FP+TN+FN  # Pop should add up to these 4 items.
@@ -197,9 +202,6 @@ class Global_Variables():  # A class creating all global variables.
     # SUNDRY GLOBAL VARIABLES
     Fig1 = None
     Plot1 = None
-    
-    Debug = None
-    
     Msg01 =  "Enter the parameters of the medical screening test "\
              "and click 'Plot Now' button."
     TitleText1 = None
@@ -241,28 +243,29 @@ class Global_Variables():  # A class creating all global variables.
 
         
 # End of Global Variables
-G = Global_Variables()    # Instantiate our static global variables.
+G = Global_Variables()    # Instantiate our global variables.
 
 
 def MainLine():
-    # Remember this app is run every time the GUI is displayed.
+    # Remember this app is run every time the GUI is displayed and 
+    # the "form run button" is clicked by the user.
     # So we have to keep track of the conversation state.
       
     ConsoleClear()  # Clear the internal IPyhon console.
     G.Debug = False  # Trace and dump some important variables.
 
     # If this the initial session create "Static/Persistent" variables.
-    if 'Dialog_State' not in GUI:
-        if G.Debug: print("Debug: First Display. Display count=1")   
+    if 'Dialog_State' not in Static:
+        if G.Debug: print("Debug: State 0. First Display. Display count=1")   
         Perform_First_Load_Only_Initialization()
-        GUI['Dialog_State'] = 1  # Upgrade state so we don't come back here.
+        Static['Dialog_State'] = 1  # Upgrade state so we don't come back here.
 
     else:  # We are responding to a session reply from the user.
-        GUI['Display_Count'] += 1  # Count of sessions.
+        Static['Display_Count'] += 1  # Count of sessions.
         if G.Debug: 
-           print("Debug: Input received. Display count=", GUI['Display_Count'])  
+           print("Debug: State 1. Display count=", Static['Display_Count'])  
         # Initalize variables for every run.
-        #   Remember nothing outside the GUI static/persistant dictionary
+        #   Remember nothing outside the Streamlit Static/persistant dictionary
         #   is preserved across sessions. So we perform the one time
         #   program initialization once then perform the "every run"
         #   intialization.
@@ -286,7 +289,7 @@ def MainLine():
 def Perform_EveryRun_Initialization():
     # Initalize variables for every run.
     #   Remember nothing is preserved across sessions, except variables in  
-    #   the GUI streamlit "session_state" and its static/persistant variables.
+    #   the streamlit static "session_state" dictionary.
     #  
     #   On the first run we perform the one time program initialization.
     #   On subsequent runs we perform the "every run" intialization to 
@@ -332,16 +335,18 @@ def Perform_First_Load_Only_Initialization():
      
      initial_sidebar_state="auto",
      
+     # \r requires two preceeding spaces to work.
      menu_items={ # These appear as the webpage "about" menu items.
      'Get Help  ':  G.Link01,
      'Report a bug  ': G.Link04,
-     'About': 'App:  ' + G.ThisModule_FileName  
-         +   '.  ' + G.ThisModule_About
-         + '  \rAuthor:  ' +  G.ThisModule_Author 
+     'About': 'Project:  ' + G.ThisModule_Project
+         + '  \r  Author:  ' +  G.ThisModule_Author   
+         + '  \rContacts:  ' +  G.ThisModule_Contact
          + '  \rProgram Purpose:  ' + G.ThisModule_Purpose 
-         + '  \rApp Version:  ' +  G.ThisModule_Version 
+         + '  \r Program: ' +  G.ThisModule_FileName 
+         + '  \r Version:  ' + G.ThisModule_Version               
                }
-                    )
+                      )
 
     # +++ CREATE PERSISTENT/STATIC VARIABLES.
     # https://docs.streamlit.io/library/api-reference/session-state
@@ -354,49 +359,46 @@ def Perform_First_Load_Only_Initialization():
     #   - Have a python dictionary like syntax.
     #   - Are created using the streamlit "session_state" method.
     #       - Eg:  st.session_state['Display_Count'] = 0
-    #       - In our case the st.session_State is abbreviated at import to GUI.
-    #          - Eg: GUI['Input_SSN'] = 0
+    #       - In our case the st.session_State is abbreviated to Static.
+    #          - from streamlit import session_state as Static
+    #          - Eg: Static['Input_SSN'] = 0
     #   - Can be "linked" to a streamlit widget via the widget key= parameter.
     #      - Using the key= parameter on any widget automatically
     #        creates a static variable in the 'session state dictionary'.
     #        But I prefer to declare them explicity as well.
-    #      - Any change in the GUI linked widget will automatically update 
+    #      - Any change in the Static linked widget will automatically update 
     #      - the linked persistant variable.
     #      - Any change in linked persistant variable will automatically 
-    #        update the linked widgets value in th GUI.
+    #        update the linked widgets value in th Static.
     #      - The python type of linked variables are specifed by the
     #        linked widget's  "format=" parameter.
     #
     #      - Eg of a Linked persistent variable.
     #         In this initialization section:
-    #              GUI['FirstName'] = "Fred"  # Create a persistant variable.
-    #         In the GUI creation code:
+    #              Static['FirstName'] = "Fred" # Create a persistant variable.
+    #         In the Static creation code:
     #             st.number_input(label=:Enter first name", key="FirstName")
     #         Notice the key is the same as the persistent variable name.
 
-    GUI['Dialog_State'] = 0    # Create session Dialog_State variable.
-    GUI['Display_Count'] = 1   # A Count of sessions.
+    Static['Dialog_State'] = 0    # Create session Dialog_State variable.
+    Static['Display_Count'] = 1   # A Count of sessions.
 
     # Persistant variables for the users input in the GUI
-    GUI['MsgText'] = G.Msg01           # A text box for instructions & errors.
-    GUI['PopSize'] = 100               # Test population.
-    GUI['Sens'] = 0.99                 # Test sensitivity.
-    GUI['Spec'] = 0.99                 # Test specifcity.
-    GUI['PrevStart'] = 0.0             # Start of range of prevalences to plot.
-    GUI['PrevEnd'] = 1.0               # End of range of prevalences to plot.
-    GUI['PrevInt'] = 0.03              # Prevalence to be highlighted on plot.
+    Static['MsgText'] = G.Msg01     # A text box for instructions & errors.
+    Static['PopSize'] = 100         # Test population.
+    Static['Sens'] = 0.99           # Test sensitivity.
+    Static['Spec'] = 0.99           # Test specifcity.
+    Static['PrevStart'] = 0.0       # Start of range of prevalences to plot.
+    Static['PrevEnd'] = 1.0         # End of range of prevalences to plot.
+    Static['PrevInt'] = 0.03        # Prevalence to be highlighted on plot.
 
-    GUI['Line_PPV'] = True
-    GUI['Line_NPV'] = True
-    GUI['Line_FP'] = True
-    GUI['Line_FN'] = True
-    GUI['Line_ACC'] = True
-    GUI['Line_PREVI'] = True
+    Static['Line_PPV'] = True
+    Static['Line_NPV'] = True
+    Static['Line_FP'] = True
+    Static['Line_FN'] = True
+    Static['Line_ACC'] = True
+    Static['Line_PREVI'] = True
  
-    GUI['TableSave'] = False           # Save table option. Checkbox.
-    GUI['TableShow'] = True            # Show table option. Checkbox.
-    GUI['PlotSave'] = False
-
     return()  # End of function: Perform_First_Load_Only_Initialization
 
 def Validate_And_Internalize_User_Input():
@@ -417,10 +419,10 @@ def Validate_And_Internalize_User_Input():
     #      - So most of the following validations are duplicative.
     #        But I have left them in as belt and suspenders.
     
-    GUI['MsgText'] = ""   
+    Static['MsgText'] = ""   
      
    
-    G.PopSize, InputOK = Validate_Integer(GUI['PopSize'])
+    G.PopSize, InputOK = Validate_Integer(Static['PopSize'])
     if InputOK == False:
        Msg_Set("Error 1006: Population size must be an integer.") 
        return(False) 
@@ -428,7 +430,7 @@ def Validate_And_Internalize_User_Input():
        Msg_Set("Error 1008: Population size must at least 100.")  
        return (False)
     
-    G.Sens,InputOK = Validate_Float(GUI['Sens'])
+    G.Sens,InputOK = Validate_Float(Static['Sens'])
     if InputOK == False:
        Msg_Set("Error 1010: Sensitivity must be numeric.")
        return (False)
@@ -436,7 +438,7 @@ def Validate_And_Internalize_User_Input():
        Msg_Set("Error 1012: Sensitivity Invalid. Must be [0,1] ")
        return (False)
    
-    G.Spec, InputOK = Validate_Float(GUI['Spec'])
+    G.Spec, InputOK = Validate_Float(Static['Spec'])
     if InputOK == False:
        Msg_Set("Error 1014: Specificity must be numeric.")
        return(False)
@@ -444,7 +446,7 @@ def Validate_And_Internalize_User_Input():
        Msg_Set("Error 1016: Specificity Invalid. Must be [0,1] ")
        return(False)
    
-    G.PrevStart, InputOK = Validate_Float(GUI['PrevStart'])
+    G.PrevStart, InputOK = Validate_Float(Static['PrevStart'])
     if InputOK == False:
        Msg_Set("Error 1018: Prevalence Start must be numeric.")
        return(False)
@@ -452,7 +454,7 @@ def Validate_And_Internalize_User_Input():
        Msg_Set("Error 1020: Prevalence Start Invalid. Must be [0,1] ")
        return(False)
    
-    G.PrevEnd, InputOK = Validate_Float(GUI['PrevEnd'])
+    G.PrevEnd, InputOK = Validate_Float(Static['PrevEnd'])
     if InputOK == False:
        Msg_Set("Error 1018: Prevalence End must be numeric.")
        return(False)
@@ -460,7 +462,7 @@ def Validate_And_Internalize_User_Input():
        Msg_Set("Error 1020: Prevalence End Invalid. Must be [0,1] ")
        return(False)
 
-    G.PrevInt, InputOK = Validate_Float(GUI['PrevInt'])
+    G.PrevInt, InputOK = Validate_Float(Static['PrevInt'])
     if InputOK == False:
        Msg_Set("Error 1022: Prevalence of Interest must be numeric.")
        return(False)
@@ -473,19 +475,16 @@ def Validate_And_Internalize_User_Input():
        return(False)
                  
    # Internalize checkbox options.
-    G.DataTable_SaveToFile_Option = GUI['TableSave'] # Save table checkbox.
-    G.DataTable_Display_Option = GUI['TableShow'] # Show table checkbox.
-    G.Plot_SaveToFile_Option = GUI['PlotSave']  
-    G.LineMetaData['PPV']['visible'] =  GUI['Line_PPV'] 
-    G.LineMetaData['NPV']['visible'] =  GUI['Line_NPV'] 
-    G.LineMetaData['FP']['visible'] =  GUI['Line_FP'] 
-    G.LineMetaData['FN']['visible'] =  GUI['Line_FN'] 
-    G.LineMetaData['ACC']['visible'] =  GUI['Line_ACC'] 
-    G.LineMetaData['PREVI']['visible'] =  GUI['Line_PREVI'] 
+    G.LineMetaData['PPV']['visible'] =  Static['Line_PPV'] 
+    G.LineMetaData['NPV']['visible'] =  Static['Line_NPV'] 
+    G.LineMetaData['FP']['visible'] =  Static['Line_FP'] 
+    G.LineMetaData['FN']['visible'] =  Static['Line_FN'] 
+    G.LineMetaData['ACC']['visible'] =  Static['Line_ACC'] 
+    G.LineMetaData['PREVI']['visible'] =  Static['Line_PREVI'] 
  
     
     # If we fall through here the users input is all valid.
-    GUI['MsgText'] = G.Msg01    # The "Please enter test specs" message.
+    Static['MsgText'] = G.Msg01    # The "Please enter test specs" message.
     return(True)  # End of function: Validate_And_Internalize_User_Input
 
 def GUI_Build_And_Show():        # Build the GUI.
@@ -511,7 +510,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Create a textbox for displaying instructions and error messages.
         st.text_area(
-            key="MsgText",   # Value will be placed in GUI['MsgText'].
+            key="MsgText",   # Value will be placed in Static['MsgText'].
             label="INSTRUCTIONS",
             height=None,
             max_chars=None,
@@ -532,7 +531,7 @@ def GUI_Build_And_Show():        # Build the GUI.
         # Create input boxes in the toolbar for our user specifed variables.
         # Input the Population Size.
         st.number_input(
-            key="PopSize",          # Value will be placed in GUI['MsgText'].
+            key="PopSize",        # Value will be placed in Static['MsgText'].
             label="Population",
             min_value=1,
             max_value=1000,
@@ -549,7 +548,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Input the Test Sensitivity.
         st.number_input(
-            key="Sens",              # Value will be placed in GUI['Sens'].
+            key="Sens",              # Value will be placed in Static['Sens'].
             label="Sensitivity",
             min_value=0.00,
             max_value=1.0,
@@ -561,7 +560,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Input The Test Specificity.
         st.number_input(
-            key="Spec",          # Value will be placed in GUI['Spec'].
+            key="Spec",          # Value will be placed in Static['Spec'].
             label="Specificity",
             min_value=0.00,
             max_value=1.0,
@@ -572,7 +571,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Input the start of the range of prevalences to be tested.
         st.number_input(
-            key="PrevStart",  # Value will be placed in GUI['PrevStart'].
+            key="PrevStart",  # Value will be placed in Static['PrevStart'].
             label="Prevalence Start",
             min_value=0.00,
             max_value=0.99,
@@ -584,7 +583,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Input the end of the range of prevalences to be tested.
         st.number_input(
-            key="PrevEnd",  # Value will be placed in GUI['PrevEnd'].
+            key="PrevEnd",  # Value will be placed in Static['PrevEnd'].
             label="Prevalence End",
             min_value=0.00,
             max_value=1.00,
@@ -596,7 +595,7 @@ def GUI_Build_And_Show():        # Build the GUI.
 
         # Input the prevalence of interest to be highlighted on the plot
         st.number_input(
-            key="PrevInt",    # Value will be placed in GUI['PrevInt'].
+            key="PrevInt",    # Value will be placed in Static['PrevInt'].
             label="Prevalence Of Interest",
             min_value=0.00,
             max_value=1.00,
@@ -816,7 +815,7 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
     G.Plot1.set_xlabel("Prevalence In Population (%)")
     G.Plot1.set_ylabel("Statistics' Value")
 
-    # Show the plot on the GUI.
+    # Show the plot on the Static.
     st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
     st.pyplot(G.Fig1)
     
@@ -871,7 +870,7 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
     helpstr = f"""You can save the data frame to your computer using this button.  \r
                 The file will be called {G.Link40}.   \r
                 The file will be in CSV format, (Comma Separated Variable).   \r
-                 The file will be saved in your browser's default download location on your computer.
+                The file will be saved in your browser's default download location on your computer.
                  """
     st.download_button(label="⚙️ Download The DataFrame", 
                        data=DataFrame_CSV, 
@@ -890,19 +889,15 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
     #  Google basing of videos  does not work because it downloads too slowly.
     #  So until I can figure out how to base videos at github we use Youtube.
     st.info("🟢  A VIDEO DEMONSTRATING THIS APP'S FEATURES.")   
-    FullURL = G.Link20
-    st.video(FullURL)
+    st.video(G.Link20)
 
     ###########################################################################
     if G.Debug:
         st.subheader("Debugging Information Follows.")
         st.caption(" The streamlit st.session_state persistant/static "
                    "variables follow.") 
-        st.write(GUI)    #  Show all streamlit persistent variables.
-        
-        # st.write(G)    # ?v fix so this works For debugging. Show global variables.
-
-
+        st.write(Static)    #  Show all streamlit persistent variables.
+ 
     return  # End of function: Right_Panel_Build
 
 def PlotNowButton_Click_Event():
@@ -952,8 +947,9 @@ def Msg_Set(TextString):
     FormattedText = TextString
     ErrStr = TextString[0:5].upper()  
     if ErrStr == "ERROR":
-        FormattedText = f"❌   There is an error in your input.    \n{FormattedText}   \nPlease correct and try again."
-    GUI['MsgText'] = FormattedText
+       FormattedText = (f"❌  There is an error in your input {FormattedText}"
+                        "\nPlease correct and try again.")
+    Static['MsgText'] = FormattedText
     G.Msg_Current = FormattedText
     return()
 
