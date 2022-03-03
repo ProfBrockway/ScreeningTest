@@ -81,7 +81,7 @@ class Global_Variables():  # A class creating all global variables.
     #   Where possible we base our resources in this apps repostitory
     #   at github. If github basing is not possible or inadequate
     #   we have to use another cloud storage site, eg Google drive.
-        
+          
     # Program Help/Documentation.    
     Link01 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/Resource_ProgramDocumentation.pdf"
     # Project Folder at Github.
