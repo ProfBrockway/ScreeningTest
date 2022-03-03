@@ -848,8 +848,7 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
         Click the links.           
         Github only provides primitive document viewers.
         So you may wish to download the files and view them on your computer.
-        Then you will be able to navigate document seeing indexes,   
-        search  etc.   
+        Then you will be able to navigate document seeing indexes, search  etc.   
         You can also see the program documentation by using
         the menu in the top right of this webpage '≡' (3 horizontal lines) then
         select 'GET HELP'. """) 
