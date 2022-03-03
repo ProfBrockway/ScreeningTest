@@ -83,7 +83,7 @@ class Global_Variables():  # A class creating all global variables.
     #   we have to use another cloud storage site, eg Google drive.
           
     # Program Help/Documentation.    
-    Link01 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/Resource_ProgramDocumentation.pdf"
+    Link01 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/Resource_Project_Documentation.pdf"
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
