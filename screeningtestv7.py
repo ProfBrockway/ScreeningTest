@@ -300,12 +300,12 @@ def Initialization_Perform_First_Load_Only():
      menu_items={ # These appear as the webpage "about" menu items.
      'Get Help  ':  G.Link01,
      'Report a bug  ': G.Link04,
-     'About': 'Project:  ' + G.ThisModule_Project
-         + '  \r  Author:  ' +  G.ThisModule_Author   
-         + '  \rContacts:  ' +  G.ThisModule_Contact
-         + '  \rProgram Purpose:  ' + G.ThisModule_Purpose 
-         + '  \r Program: ' +  G.ThisModule_FileName 
-         + '  \r Version:  ' + G.ThisModule_Version               
+     'About': '  \rProgram: ' +  G.ThisModule_FileName 
+            + '  \rProject:  ' + G.ThisModule_Project
+            + '  \rProgram Purpose:  ' + G.ThisModule_Purpose 
+            + '  \rAuthor:  ' +  G.ThisModule_Author   
+            + '  \rContacts:  ' +  G.ThisModule_Contact
+            +  '  \rVersion:  ' + G.ThisModule_Version               
                }
                       )
 
