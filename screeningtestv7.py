@@ -1,68 +1,33 @@
 
+r"""
 # To run the web browser and see our web page enter the following command.
-# streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7-00.py"
+# streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
 
 # TO DO
-# - Solve the view documentaion problem. See the other todo doc.
-#   get help/about menu to show spaces. markdown is just eliminating all extra spaces.
-# - check results carefully.
-# - Add a slider for the prevint ?
+    # - Solve the view documentaion problem. See the other todo doc.
+    #   get help/about menu to show spaces. markdown is just eliminating all extra spaces.
+    # - Convert to plotly from matplotlib but keep matplotlib code.
+    # -  Plotly creates a better more interactive plot in the streamlit page.
+    # - Move the "plot lines to be shown" selector to the right pane.
+    # - Add a slider for the prevint ?
+    # - Create documentation including a documentation vidio and deploy it
+    #    - https://docs.python-guide.org/writing/documentation/
+    
+    # For final submission.
+    # - check results carefully.
+    # - create an actual test case of a specific covid screening test.
+"""
+ 
 
-
-###############################################################################
-#                     "Accuracy" Of Medical Screening Tests 
-###############################################################################
-#
-# Course: CCSU Stat 476.  Spring 2021.
-# Author: Tim Brockway. Student ID: 30259316   Email: BrockwayTim@My.CCSU.edu
-# Professor: Roger L. Bilisoly
-#     bilisolyr@ccsu.edu  https://www2.ccsu.edu/faculty/bilisolyr
-#
-# ScreeningTest:  PROGRAM PURPOSE.
-#
-#   Medical screening tests vaunting a very high "general accuracy" can give
-#   staggering levels of false results when the prevalence of a disease is low.
-#   This program explores the effect the prevalence of an infection in a
-#   population on the usefullness of screening tests. The goal is to
-#   demonstrate that the Epidemiology of screening tests is complex and 
-#   they are usually less reliable than commonly supposed.
-#
-# Inputs:
-#        A GUI asks the user to enter the following medical test statistics.
-#          Population: 
-#          Test Sensitivity:
-#          Test Specificity:
-#          Start of Prevalence Range.
-#          End of Prevalence Range:
-#          Prevalence of Interest:  
-#          CheckBoxes allowing the plotting of different statitics.
-#
-# Outputs:
-#        (1) A plot with:
-#           x axis. A range of disease prevalances.
-#           y axis:
-#                  Positivie Predictive Value.
-#                  Negative Predictive Value.
-#                  False Positives (NPV)
-#                  False Negatives (NPV)
-#                  General Accuracy (A somewhat misleading item !)
-#                  Prevalence of Interest (Vertical line).
-#        (2) Save the plot to disk. (Optional)
-#        (3) A table of the plot data.(Optional)
-#  
-# Result Verification:
-#    Our graphs seems correct.  See a similar one at:
-#    https://epitools.ausvet.com.au/predictivevalues
-#
-############################################################################### 
-
-
+ 
 
 import os
 import streamlit as st
 from streamlit import session_state as Static
 import pandas as pd
 import matplotlib as mpl  
+import scipy # Used by plotly figure factory behind the scenes.
+import plotly.figure_factory as ff
 
 
 class Global_Variables():  # A class creating all global variables.
@@ -75,6 +40,7 @@ class Global_Variables():  # A class creating all global variables.
     ThisModule_Purpose = ("To demonstrate the effect of disease prevalence " 
                          "on medical screening tests.")
     ThisModule_Contact = "Contacts not supplied."
+    ThisModule_Docstring = (__doc__)
     ThisModule_FullPath  = os.path.abspath(__file__)
     ThisModule_FileName = os.path.basename(ThisModule_FullPath)
     ThisModule_ProjectPath = os.path.dirname(ThisModule_FullPath)
@@ -83,10 +49,10 @@ class Global_Variables():  # A class creating all global variables.
     #   Where possible we base our resources in this apps repostitory
     #   at github. If github basing is not possible or inadequate
     #   we have to use another cloud storage site, eg Google drive.
-          
+         
     # Program Help/Documentation.    
     Link01 = ("https://github.com/ProfBrockway/ScreeningTest/" 
-             "blob/main/Resource_Project_Documentation.pdf")
+             "blob/main/Resource_App_Documentation_Full.pdf")
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
@@ -96,7 +62,7 @@ class Global_Variables():  # A class creating all global variables.
     # Name of downloaded table file
     Link40 = "ScreeningTestDataFrame.csv"
     
-    Debug = None
+    Debug = False
     # +++ END OF RESOURCES AND OTHER LINKS OR VARIABLES THAT MIGHT CHANGE.
     ###########################################################################
  
@@ -239,25 +205,20 @@ class Global_Variables():  # A class creating all global variables.
                                }
 
                     }
-        
-
-        
 # End of Global Variables
 G = Global_Variables()    # Instantiate our global variables.
-
 
 def MainLine():
     # Remember this app is run every time the GUI is displayed and 
     # the "form run button" is clicked by the user.
     # So we have to keep track of the conversation state.
-      
+        
     ConsoleClear()  # Clear the internal IPyhon console.
-    G.Debug = False  # Trace and dump some important variables.
 
     # If this the initial session create "Static/Persistent" variables.
     if 'Dialog_State' not in Static:
         if G.Debug: print("Debug: State 0. First Display. Display count=1")   
-        Perform_First_Load_Only_Initialization()
+        Initialization_Perform_First_Load_Only()
         Static['Dialog_State'] = 1  # Upgrade state so we don't come back here.
 
     else:  # We are responding to a session reply from the user.
@@ -269,24 +230,24 @@ def MainLine():
         #   is preserved across sessions. So we perform the one time
         #   program initialization once then perform the "every run"
         #   intialization.
-        Perform_EveryRun_Initialization()
+        Initialization_Perform_EveryRun()
         # Validate and internalize users'input.
-        InputOK = Validate_And_Internalize_User_Input()
+        InputOK = User_Input_Validate_And_Internalize()
         if InputOK == True:
             # Build a table for the efficacies of the screening test across
             # the range of disease prevalences specified by the user.
-            Process_Users_Input()
+            User_Input_Process()
             # Plot the table of efficacies of the screening test.
-            Right_Panel_Build()
+            GUI_Right_Panel_Build()
             
         else:  # There is an error in the users input. 
            st.error(G.Msg_Current) # Show the error in the right panel.
 
     # Display the results and wait for next user input.
-    GUI_Build_And_Show()
+    GUI_Build_Basic_Layout()
     return()  # End of function: MainLine.
 
-def Perform_EveryRun_Initialization():
+def Initialization_Perform_EveryRun():
     # Initalize variables for every run.
     #   Remember nothing is preserved across sessions, except variables in  
     #   the streamlit static "session_state" dictionary.
@@ -313,10 +274,10 @@ def Perform_EveryRun_Initialization():
  
     return()
 
-def Perform_First_Load_Only_Initialization():
+def Initialization_Perform_First_Load_Only():
 
     # Initalize variables etc.
-    Perform_EveryRun_Initialization()
+    Initialization_Perform_EveryRun()
 
     # ++++ Set up a typical "About/Help" menu for the webpage.
     #  - The set_page_config command can only be used once per run.
@@ -347,6 +308,7 @@ def Perform_First_Load_Only_Initialization():
          + '  \r Version:  ' + G.ThisModule_Version               
                }
                       )
+
 
     # +++ CREATE PERSISTENT/STATIC VARIABLES.
     # https://docs.streamlit.io/library/api-reference/session-state
@@ -399,9 +361,9 @@ def Perform_First_Load_Only_Initialization():
     Static['Line_ACC'] = True
     Static['Line_PREVI'] = True
  
-    return()  # End of function: Perform_First_Load_Only_Initialization
+    return()  # End of function: Initialization_Perform_First_Load_Only
 
-def Validate_And_Internalize_User_Input():
+def User_Input_Validate_And_Internalize():
     # - This function validates the users input.
     # - This function also internalizes the users input.
     #     -Internalization isolates the data processing from the GUI.
@@ -485,9 +447,96 @@ def Validate_And_Internalize_User_Input():
     
     # If we fall through here the users input is all valid.
     Static['MsgText'] = G.Msg01    # The "Please enter test specs" message.
-    return(True)  # End of function: Validate_And_Internalize_User_Input
+    return(True)  # End of function: User_Input_Validate_And_Internalize
 
-def GUI_Build_And_Show():        # Build the GUI.
+def User_Input_Process():
+    # Build table of statistics for the specified range of prevalences.
+    # For the specified range of prevalences (Eg Prevs from 0% to 100%) build
+    # a table with a row for each prevalence in the range and that
+    # prevalences' statistics.
+
+    # Creete a list of population disease prevalences percentages
+    # over which  we  want to test the efficacy of the screening test.
+    G.PrevList.clear()   #  Clear the table.
+    
+    # Avoid zero divide by altering a zero prevalence to a near zero number.
+    if G.PrevStart == 0:
+        G.PrevStart = 0.00000000000000000001
+        
+    # The increment controls the number of data points on the x axis.    
+    prev_increment = (G.PrevEnd - G.PrevStart) / 100
+    i = 0
+    G.PrevList.append(G.PrevStart)
+    while G.PrevList[i] < G.PrevEnd:
+        G.PrevList.append(G.PrevList[i] + prev_increment )
+        i = i + 1
+
+    # Process each of the Prev's in the list of Prev's to be tested.
+    # The stats for each prev are calculated and stored in a table row.
+    G.DataTable = G.DataTable[0:0] # Clear the DataTable. Retain its structure.
+    
+    # Add rows to the DataTable
+    for PrevCurrent in G.PrevList:  
+        # TP  True Positive:  The test is positive & testee is infected.
+        # TP = PopulationSize * PopulationPrevalence * Sens.
+        G.TP = G.PopSize * PrevCurrent * G.Sens
+    
+        # FP  False Positive:  Test is positive & testee is NOT infected.
+        # FP = PopulationSize * (1 - PopulationPrevalence) * (1 - Spec)
+        G.FP =   G.PopSize * (1 - PrevCurrent) * (1 - G.Spec)
+    
+        # TN  True Negative: Test is negative & testee is NOT infected.
+        # TN = PopulationSize * (1- PopulationPrevalence) * Spec
+        G.TN = G.PopSize * (1 - PrevCurrent) * G.Spec
+    
+        # FN  False Negative: The test is negative & testee IS infected.
+        # FN = PopulationSize * PopulationPrevalence * (1 - Sens)
+        G.FN = G.PopSize * PrevCurrent * (1 - G.Sens)
+    
+        # Sens: Sens aka TPR / (True Positive Rate)
+        # The proportion of test positives that are correct.
+        # (When the test is positive & person IS infected).
+        G.Sens = G.TP / (G.TP + G.FN)
+    
+        # Spec: Spec aka TNR (True Negative Rate)
+        # The proportion of test negatives that are correct.
+        # (When the test is negative & person is not infected).
+        G.Spec = G.TN / (G.TN + G.FP)
+    
+        # PPV: Positive Predictive Value
+        # The probability that a testee is infected given & tested positive.
+        # Eg: A PPV = 11% means that of those who test positive only
+        #     11% are infected.
+        G.PPV = G.TP / (G.TP + G.FP)
+    
+        # NPV: Negative Predictive Value
+        #  The probability that a testee is infected & tested negative.
+        G.NPV = G.TN / (G.TN + G.FN)
+    
+        # ACC: Accuracy: = ((TP + TN)) / Pop
+        G.Acc = (G.TP + G.TN) / G.PopSize
+        
+        # Add the stats for the Population Prevalence we have just processed
+        # to our results table, DataTable if required.
+        newrow = {'Prevalence' : PrevCurrent,
+                  'TP'       : G.TP,
+                  'FP'       : G.FP,
+                  'TN'       : G.TN,
+                  'FN'       : G.FN,
+                  'Accuracy' : G.Acc,
+                  'Sens'     : G.Sens,
+                  'Spec'     : G.Spec,
+                  'PPV'      : G.PPV,
+                  'NPV'      : G.NPV,
+                  'Population' : G.PopSize
+                  }
+        G.DataTable = G.DataTable.append(newrow, ignore_index=True)
+        
+    # End For each PrevCurrent
+            
+    return # End of function: User_Input_Process
+
+def GUI_Build_Basic_Layout():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
     #   on the left and a plot and display area on the right.
     #
@@ -620,97 +669,107 @@ def GUI_Build_And_Show():        # Build the GUI.
         st.checkbox(key="Line_PREVI", label="Show the PREVI line in plot.",
                     help=G.LineMetaData['PREVI']['label'])
 
-    return()  # End of function: GUI_Build_And_Show
+    return()  # End of function: GUI_Build_Basic_Layout
 
-def Process_Users_Input():
-    # Build table of statistics for the specified range of prevalences.
-    # For the specified range of prevalences (Eg Prevs from 0% to 100%) build
-    # a table with a row for each prevalence in the range and that
-    # prevalences' statistics.
-
-    # Creete a list of population disease prevalences percentages
-    # over which  we  want to test the efficacy of the screening test.
-    G.PrevList.clear()   #  Clear the table.
+def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
-    # Avoid zero divide by altering a zero prevalence to a near zero number.
-    if G.PrevStart == 0:
-        G.PrevStart = 0.00000000000000000001
+    # Build the plot requested by the user and place it on the GUI.
+    Plot_Build()
+    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
+    st.pyplot(G.Fig1)
+    
+    ###########################################################################
+    # +++ MAKE THIS APPS DOCUMENTATION AVAILABLE.
+    #   We  base the pdf file in the github repository for the project.
+    #   The github using the github link to the address displays
+    #   the pdf file in the primitive github pdf view which does not
+    #   have basic features, especially the pdf document index.
+    #   I have not been able to fix this problem so for now, the pdf
+    #   is displayed and the user advised to download it a use a 
+    #   proper pdf viewer.
+    st.info("🟢 THIS APP'S DOCUMENTATION.")
+       
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(" [ Link To This App's Documentation.]"  "(%s)" % G.Link01)
+        st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
+    with col2: 
+        # Display a pop up help message to help accessing documentation.
+        # We use an st.button and load its help parameter with our popup.
+        # This works fine when the user hovers the mouse over the button.   
+        # But when the user clicks the button (as is reasonable) the
+        # app is rerun. This doesn't produce any errors but is obviously
+        # inefficient. We have to live with this until we find a better
+        # method for pop up messages.
+        tempstr = (""" You can read this app's documentation in the project's
+        Gihub project 'repository'.   
+        Click the links.           
+        Github only provides primitive document viewers.
+        So you may wish to download the files and view them on your computer.
+        Then you will be able to navigate document seeing indexes, search  etc.   
+        You can also see the program documentation by using
+        the menu in the top right of this webpage '≡' (3 horizontal lines) then
+        select 'GET HELP'. """) 
+        st.button(label="Help", key="ButtonH1", help=tempstr )
+
+    
+    ###########################################################################
+    # +++ Show the DataTable.
+    st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS")
+    st.dataframe(data=G.DataTable, width=None, height=None)
+
+    #  +++ ADD A "DOWNLOAD" DATAFRAME BUTTON.
+    # - The dataframe is converted to a csv file.
+    # - That file is downloaded to the browsers download location.
+    # - There is no "save as" menu. The file name is hard coded.
+    DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
+    helpstr = f"""You can save the data frame to your computer using this button.  \r
+                The file will be called {G.Link40}.   \r
+                The file will be in CSV format, (Comma Separated Variable).   \r
+                The file will be saved in your browser's default download location on your computer.  \r
+                You can enlarge the table by clicking the 'View fullscreen' icon located at the top right of the table.  \r
+                'Float' the mouse over the table and the 'View fullScreen' icon will appear.
+                 """
+    st.download_button(label="⚙️ Download The DataFrame", 
+                       data=DataFrame_CSV, 
+                       file_name=G.Link40, 
+                       mime= "text/csv",
+                       key="DownloadCSV_Button", 
+                       help=helpstr, 
+                       on_click=None, 
+                       args=None,
+                       kwargs=None, 
+                       disabled=False)
+
+    ###########################################################################
+    # +++ SHOW A VIDEO DEMONSTRATING THIS APP.
+    #  Github basing of videos does not allow raw address of large files.
+    #  Google basing of videos  does not work because it downloads too slowly.
+    #  So until I can figure out how to base videos at github we use Youtube.
+    st.info("🟢  A VIDEO DEMONSTRATING THIS APP'S FEATURES.")   
+    st.video(G.Link20)
+
+    ###########################################################################
+    # +++ SHOW THIS APPS DOCSTRING
+    #  Github basing of videos does not allow raw address of large files.
+    #  Google basing of videos  does not work because it downloads too slowly.
+    #  So until I can figure out how to base videos at github we use Youtube.
+    st.info("🟢  THIS APP's DOCUMENT STRING FOLLOWS.")   
+    st.text(G.ThisModule_Docstring)
+
+ 
+
+    ###########################################################################
+    if G.Debug:
+        st.subheader("Debugging Information Follows.")
+        st.caption(" The streamlit st.session_state persistant/static "
+                   "variables follow.") 
+        st.write(Static)    #  Show all streamlit persistent variables.
         
-    # The increment controls the number of data points on the x axis.    
-    prev_increment = (G.PrevEnd - G.PrevStart) / 100
-    i = 0
-    G.PrevList.append(G.PrevStart)
-    while G.PrevList[i] < G.PrevEnd:
-        G.PrevList.append(G.PrevList[i] + prev_increment )
-        i = i + 1
+ 
+    return  # End of function: GUI_Right_Panel_Build
 
-    # Process each of the Prev's in the list of Prev's to be tested.
-    # The stats for each prev are calculated and stored in a table row.
-    G.DataTable = G.DataTable[0:0] # Clear the DataTable. Retain its structure.
-    
-    # Add rows to the DataTable
-    for PrevCurrent in G.PrevList:  
-        # TP  True Positive:  The test is positive & testee is infected.
-        # TP = PopulationSize * PopulationPrevalence * Sens.
-        G.TP = G.PopSize * PrevCurrent * G.Sens
-    
-        # FP  False Positive:  Test is positive & testee is NOT infected.
-        # FP = PopulationSize * (1 - PopulationPrevalence) * (1 - Spec)
-        G.FP =   G.PopSize * (1 - PrevCurrent) * (1 - G.Spec)
-    
-        # TN  True Negative: Test is negative & testee is NOT infected.
-        # TN = PopulationSize * (1- PopulationPrevalence) * Spec
-        G.TN = G.PopSize * (1 - PrevCurrent) * G.Spec
-    
-        # FN  False Negative: The test is negative & testee IS infected.
-        # FN = PopulationSize * PopulationPrevalence * (1 - Sens)
-        G.FN = G.PopSize * PrevCurrent * (1 - G.Sens)
-    
-        # Sens: Sens aka TPR / (True Positive Rate)
-        # The proportion of test positives that are correct.
-        # (When the test is positive & person IS infected).
-        G.Sens = G.TP / (G.TP + G.FN)
-    
-        # Spec: Spec aka TNR (True Negative Rate)
-        # The proportion of test negatives that are correct.
-        # (When the test is negative & person is not infected).
-        G.Spec = G.TN / (G.TN + G.FP)
-    
-        # PPV: Positive Predictive Value
-        # The probability that a testee is infected given & tested positive.
-        # Eg: A PPV = 11% means that of those who test positive only
-        #     11% are infected.
-        G.PPV = G.TP / (G.TP + G.FP)
-    
-        # NPV: Negative Predictive Value
-        #  The probability that a testee is infected & tested negative.
-        G.NPV = G.TN / (G.TN + G.FN)
-    
-        # ACC: Accuracy: = ((TP + TN)) / Pop
-        G.Acc = (G.TP + G.TN) / G.PopSize
-        
-        # Add the stats for the Population Prevalence we have just processed
-        # to our results table, DataTable if required.
-        newrow = {'Prevalence' : PrevCurrent,
-                  'TP'       : G.TP,
-                  'FP'       : G.FP,
-                  'TN'       : G.TN,
-                  'FN'       : G.FN,
-                  'Accuracy' : G.Acc,
-                  'Sens'     : G.Sens,
-                  'Spec'     : G.Spec,
-                  'PPV'      : G.PPV,
-                  'NPV'      : G.NPV,
-                  'Population' : G.PopSize
-                  }
-        G.DataTable = G.DataTable.append(newrow, ignore_index=True)
-        
-    # End For each PrevCurrent
-            
-    return # End of function: Process_Users_Input
-
-def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
-
+def Plot_Build():
     # Create a graph of Prevalence (x axis) vs various statistics.
     # Here we actually build the plot with multiple graph lines.
     # The user has specified which lines to include.
@@ -792,17 +851,21 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
                     pass
     
                 G.PointLabel = str(
-                    "   {:.2f}".format(y * 100) + 
+                    "   {:.3f}".format(y * 100) + 
                     "% of all positives are false at a  prevalence of " +
-                    "{:.2f}".format(G.PrevInt ) + "."
+                    "{:.6f}".format(G.PrevInt ) + "."
                                )
-                
-                G.Plot1.annotate(
-                    G.PointLabel,
-                    (x,y), # these are the coordinates to position the label
-                    textcoords="offset points", # how to position the text
-                    xytext=(5,10), # distance from text to points (x,y)
-                    ha='left') # horizontal alignment: left, right or center
+                # We don't display the following annotation because
+                # it sometimes displays in a disruptive way.
+                # Sometimes it extends the "width" of the plot by appearing
+                # on the extreme left or right which causes the graph as
+                # a whole to display very small and unreadable.
+                # G.Plot1.annotate(
+                #     G.PointLabel,
+                #     (x,y), # these are the coordinates to position the label
+                #     textcoords="offset points", # how to position the text
+                #     xytext=(5,10), # distance from text to points (x,y)
+                #     ha='left') # horizontal alignment: left, right or center
                 break  # Break the for loop
             Precedingx = x
             Precedingy = y
@@ -814,91 +877,8 @@ def Right_Panel_Build():  # Create a graph prevalence vs varius statistics.
     G.Plot1.grid(visible=True, which='major', axis="both")
     G.Plot1.set_xlabel("Prevalence In Population (%)")
     G.Plot1.set_ylabel("Statistics' Value")
-
-    # Show the plot on the Static.
-    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
-    st.pyplot(G.Fig1)
     
-    ###########################################################################
-    # +++ MAKE THIS APPS DOCUMENTATION AVAILABLE.
-    #   We  base the pdf file in the github repository for the project.
-    #   The github using the github link to the address displays
-    #   the pdf file in the primitive github pdf view which does not
-    #   have basic features, especially the pdf document index.
-    #   I have not been able to fix this problem so for now, the pdf
-    #   is displayed and the user advised to download it a use a 
-    #   proper pdf viewer.
-    st.info("🟢 THIS APP'S DOCUMENTATION.")
-       
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(" [ Link To This App's Documentation.]"  "(%s)" % G.Link01)
-        st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
-    with col2: 
-        # Here we use a trick to display a pop up help message.
-        # We use an st.button and load its help parameter with our popup.
-        # This works fine when the user hovers the mouse over the button.   
-        # But when the user clicks the button (as is reasonable) the
-        # app is rerun. This doesn't produce any errors but is obviously
-        # inefficient. We have to live with this until we find a better
-        # method for pop up messages.
-        tempstr = (""" You can read this app's documentation in the project's
-        Gihub project 'repository'.   
-        Click the links.           
-        Github only provides primitive document viewers.
-        So you may wish to download the files and view them on your computer.
-        Then you will be able to navigate document seeing indexes, search  etc.   
-        You can also see the program documentation by using
-        the menu in the top right of this webpage '≡' (3 horizontal lines) then
-        select 'GET HELP'. """) 
-        st.button(label="Help", key="ButtonH1", help=tempstr )
-
-  
-  
-
-    
-    ###########################################################################
-    # +++ Show the DataTable.
-    st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS")
-    st.dataframe(data=G.DataTable, width=None, height=None)
-
-    #  +++ ADD A "DOWNLOAD" DATAFRAME BUTTON.
-    # - The dataframe is converted to a csv file.
-    # - That file is downloaded to the browsers download location.
-    # - There is no "save as" menu. The file name is hard coded.
-    DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
-    helpstr = f"""You can save the data frame to your computer using this button.  \r
-                The file will be called {G.Link40}.   \r
-                The file will be in CSV format, (Comma Separated Variable).   \r
-                The file will be saved in your browser's default download location on your computer.
-                 """
-    st.download_button(label="⚙️ Download The DataFrame", 
-                       data=DataFrame_CSV, 
-                       file_name=G.Link40, 
-                       mime= "text/csv",
-                       key="DownloadCSV_Button", 
-                       help=helpstr, 
-                       on_click=None, 
-                       args=None,
-                       kwargs=None, 
-                       disabled=False)
-
-    ###########################################################################
-    # +++ SHOW A VIDEO DEMONSTRATING THIS APP.
-    #  Github basing of videos does not allow raw address of large files.
-    #  Google basing of videos  does not work because it downloads too slowly.
-    #  So until I can figure out how to base videos at github we use Youtube.
-    st.info("🟢  A VIDEO DEMONSTRATING THIS APP'S FEATURES.")   
-    st.video(G.Link20)
-
-    ###########################################################################
-    if G.Debug:
-        st.subheader("Debugging Information Follows.")
-        st.caption(" The streamlit st.session_state persistant/static "
-                   "variables follow.") 
-        st.write(Static)    #  Show all streamlit persistent variables.
- 
-    return  # End of function: Right_Panel_Build
+    return() # End of function: Plot_Build().
 
 def PlotNowButton_Click_Event():
     # Not used.
@@ -931,18 +911,6 @@ def Validate_Integer(TextString):
     else:
         return(tempvar,True)
 
-
-def Plot_Download():
-    # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
-
-    # FullPath = os.path.join(os.getcwd(), 'PlotImg2.jpg')
-    # G.Fig1.savefig(fname=FullPath, format="jpg")
-    # # G.Fig1.savefig(sys.stdout.buffer)
-    # # mpl.pyplot.savefig(fname="ScreenTestPlot.jpg", format="jpg")
-    # # mpl.pyplot.savefig(path,name_of_file+".pdf")
-
-    return()  # End of function: Plot_Download()
-
 def Msg_Set(TextString):
     FormattedText = TextString
     ErrStr = TextString[0:5].upper()  
@@ -952,7 +920,6 @@ def Msg_Set(TextString):
     Static['MsgText'] = FormattedText
     G.Msg_Current = FormattedText
     return()
-
 
 def StMarkdown(TextToBeFormated="", color="black",
     fontsize=14,bold=False,italic=False,fontname="Courier",align="left" ):
@@ -983,7 +950,6 @@ def StMarkdown(TextToBeFormated="", color="black",
                   "</p>"]
                )
     return(md)  # End of function: StMarkdown
-
 
 def Title_Build(TitleLength = "short"):
     G.TitleText1 = str(

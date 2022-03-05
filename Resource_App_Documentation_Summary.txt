@@ -1,0 +1,55 @@
+
+r"""
+
+###############################################################################
+#                     "Accuracy" Of Medical Screening Tests 
+###############################################################################
+#
+# Course: CCSU Stat 476.  Spring 2021.
+# Author: Tim Brockway. Student ID: 30259316   Email: BrockwayTim@My.CCSU.edu
+# Professor: Roger L. Bilisoly
+#     bilisolyr@ccsu.edu  https://www2.ccsu.edu/faculty/bilisolyr
+#
+# ScreeningTest:  PROGRAM PURPOSE.
+#
+#   Medical screening tests vaunting a very high "general accuracy" can give
+#   staggering levels of false results when the prevalence of a disease is low.
+#   This program explores the effect the prevalence of an infection in a
+#   population on the usefullness of screening tests. The goal is to
+#   demonstrate that the Epidemiology of screening tests is complex and 
+#   they are usually less reliable than commonly supposed.
+#
+# Inputs:
+#        A GUI asks the user to enter the following medical test statistics.
+#          Population: 
+#          Test Sensitivity:
+#          Test Specificity:
+#          Start of Prevalence Range.
+#          End of Prevalence Range:
+#          Prevalence of Interest:  
+#          CheckBoxes allowing the plotting of different statitics.
+#
+# Outputs:
+#        (1) A plot with:
+#           x axis. A range of disease prevalances.
+#           y axis:
+#                  Positivie Predictive Value. (PPV)
+#                  Negative Predictive Value. (NPV)
+#                  False Positives (FP)
+#                  False Negatives (FN)
+#                  General Accuracy (ACC) (A somewhat misleading item !)
+#                  Prevalence of Interest (PREVINT ) (A Vertical line).)
+#        (2) A table of the generated data used to create the plots.
+#        (3) A video tour of the app and its features
+#
+# Features:
+#       All outputs can be saved to the users local computer, viewed full
+#       screen or browsed from the GUI
+#           This is true of the entire projects code.
+#  
+# Result Verification:
+#    Our graphs seems correct.  See a similar one at:
+#    https://epitools.ausvet.com.au/predictivevalues
+#
+############################################################################### 
+"""
