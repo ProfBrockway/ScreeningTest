@@ -7,8 +7,7 @@ r"""
     # - Solve the view PDF documentaion problem. See the other todo doc.
     # Why are  plotky line legend renames NOT working ?
     #   get help/about menu to show spaces. markdown is just eliminating all extra spaces.
-    # - Convert to plotly from matplotlib but keep matplotlib code.
-    # -  Plotly creates a better more interactive plot in the streamlit page.
+
     # - Move the "plot lines to be shown" selector to the right pane.
     # - Add a slider for the prevint ?
     # - Create documentation including a documentation vidio and deploy it
@@ -19,20 +18,13 @@ r"""
     # - create an actual test case of a specific covid screening test.
 """
  
-# Note: We use Plotly to create great interactive plots easily.
-#       But I have left the Matplotlib graphing code in this module.
-#       in case I ever have to use Matplotlib.
-#       This code is being developed as a sort of template for
-#       a typical datascience app.
- 
-
 import os
 import streamlit as st
 from streamlit import session_state as S
 import pandas as pd
 import matplotlib as mpl  
 
-# Plotly imports.
+# Plotly imports. Some may be flagged as unused, but import them anyway.
 import scipy # Used by plotly figure factory behind the scenes.
 import plotly
 import plotly.express as px 
@@ -197,14 +189,14 @@ class Global_Variables():  # A class creating all global variables.
     False_Neg_Message = None    
 
     # Switches to show or not show each plot line per users request.
-    LineShow_PPV = True
-    LineShow_FPPercent = True
-    LineShow_NPV = True
-    LineShow_FNPercent = True
-    LineShow_FP = True
-    LineShow_FN = True
-    LineShow_ACC = True
-    LineShow_Prevint = True
+    LineShow_PPV = None
+    LineShow_FPPercent = None
+    LineShow_NPV = None
+    LineShow_FNPercent = None
+    LineShow_FP = None
+    LineShow_FN = None
+    LineShow_ACC = None
+    LineShow_Prevint = None
 # End of Global Variables
 G = Global_Variables()    # Instantiate our global variables.
 
@@ -609,28 +601,44 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             on_change=None)
  
         # Add checkboxes for selecting the lines to be shown on plot.
+        
+        # !! Don't add a value= parameter. This would cause the streamlit
+        #    bug "Did you forget to initialize".
+        # Instead let the static variable created by the key= parameter
+        # do the work.
         st.checkbox(key="LineShow_FPPercent", 
+           # Intial and subsequent values are in key S.LineShow_FPPercent.         
            label="Show the False Positive Percent line.",
            help="FPPercent: The percentange of all postives that are false.")
         st.checkbox(key="LineShow_FNPercent", 
+           # Intial and subsequent values are in key S.LineShow_FNPercent. 
            label="Show the False Negative Percent line.",
            help="FNPercent: The percentange of all negatives that are false.")
-        st.checkbox(key="LineShow_PPV", 
+        st.checkbox(key="LineShow_PPV",
+           # Intial and subsequent values are in key S.LineShow_PPV.         
            label="Show the PPV line.", 
            help="PPV: The positive predictive value")
         st.checkbox(key="LineShow_NPV",
+           # Intial and subsequent values are in key S.LineShow_NPV.  
            label="Show the NPV line..",
            help="NPV: The negative predictive value")
         st.checkbox(key="LineShow_FP",
+           # Intial and subsequent values are in key S.LineShow_FP. 
            label="Show the FP line.", 
            help="FP: False Positive")
         st.checkbox(key="LineShow_FN",
+           # Intial and subsequent values are in key S.LineShow_FN.         
+           value=G.LineShow_FN,         
            label="Show the FN line.", 
            help="FN: False Negative")
         st.checkbox(key="LineShow_ACC",
+           # Intial and subsequent values are in key S.LineShow_ACC.         
+           value=G.LineShow_ACC,         
            label="Show the General Accuracy line.", 
            help="ACC: General Accuracy")
         st.checkbox(key="LineShow_PREVI",
+           # Intial and subsequent values are in key S.LineShow_PrevI.         
+           value=G.LineShow_Prevint,         
            label="Show the PrevInt line..",
            help="PrevInt: A vertical line at the prevalence of interest.")
 
@@ -641,7 +649,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     ###########################################################################
     # +++ BUILD THE PLOT REQUESTED BY THE USER AND PLACE IT ON THE GUI.
     st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
-    Plot_Build_Plotly()  # Use Plotly to create graphs. 
+    Plot_Build_Plotly_GO()  # Use Plotly to create graphs. 
     st.text(Title_Build(formatfor="regular")) # Display a title box.
     # Place the Plotly plot on the Streamlit page.
     st.plotly_chart(G.Fig1, use_container_width=False, sharing="streamlit")
@@ -767,7 +775,10 @@ def GUI_HelpMenu_Build():
                       )
     return()  # End of function: GUI_HelpMenu_Build
 
-def Plot_Build_Plotly(): # Create our plot using Plotly
+def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
+    # Plotly graph objects (GO) are for building plots "by hand".
+    # GO graphing gives more control than graphing with Plotly Express.
+    
     # Create a graph of Prevalence (x axis) vs various statistics.
     # We build a line plot with multiple graph lines.
     # The user can also hide or show drawn lines  by clicking the plot's 
@@ -777,51 +788,69 @@ def Plot_Build_Plotly(): # Create our plot using Plotly
     
     # Plot all graph lines on one axis.
     # We add the lines(aka traces) to the plot that the user has requested.
-    if G.LineShow_PPV:  
-        G.Fig1.add_trace(go.Line(
-            name="Positive Predictive Value (PPV)",
-            x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
-            line=dict(color="orange"  )   ))
-
-    if G.LineShow_NPV:   
-        G.Fig1.add_trace(go.Line(
-            name="Negative Predictive Values (NPV)",
-            x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
-            line=dict(color="magenta")  ))
-
-    if G.LineShow_FP:    
-        G.Fig1.add_trace(go.Line(
-            name="False Positive (FP)",
-            x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
-            line=dict(color="black")  ))
-
-    if G.LineShow_FN:     
-        G.Fig1.add_trace(go.Line(
-            name="False Negative (FN)",
-            x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
-            line=dict(color="peru" ) ))
- 
-    if G.LineShow_ACC:     
-        G.Fig1.add_trace(go.Line(
-            name="General Accuracy (ACC)",
-            x=G.DataTable["Prevalence"], y=G.DataTable["ACC"], 
-            line=dict(color="green")  ))
-    
     if G.LineShow_FPPercent:     
         G.Fig1.add_trace(go.Line(
-            name="False Positive Percentage (FPPercent)",
+            name="False Positive Percentage", # Shows in Legend.
+            text="False Positive Percentage", # Shows in Hovertext.
+            legendrank=1, # Where the line will appear in the legend list.
             x=G.DataTable["Prevalence"], y=G.DataTable["FPPercent"], 
             line=dict(color="red")  )) 
         
     if G.LineShow_FNPercent:      
         G.Fig1.add_trace(go.Line(
-            name="False Negative Percentage (FNPercent)",
+            name="False Negative Percentage",
+            text="False Negative Percentage",
+            legendrank=2,
             x=G.DataTable["Prevalence"], y=G.DataTable["FNPercent"], 
             line=dict(color="blue")  ))     
-        
-    if G.LineShow_Prevint:      
-        # Add a vertical line at the prevalence of interest.
-        G.Fig1.add_vline(x=G.PrevInt,line_dash="dash", line_color="red") 
+    
+    if G.LineShow_PPV:  
+        G.Fig1.add_trace(go.Line(
+            name="Positive Predictive Value",   
+            text="Positive Predictive Value",   
+            legendrank=3,
+            x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
+            line=dict(color="green"  )   ))
+
+    if G.LineShow_NPV:   
+        G.Fig1.add_trace(go.Line(
+            name="Negative Predictive Values",
+            text="Negative Predictive Values",
+            legendrank=4,
+            x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
+            line=dict(color="magenta")  ))
+
+    if G.LineShow_FP:    
+        G.Fig1.add_trace(go.Line(
+            name="False Positive",
+            text="False Positive",
+            legendrank=5,
+            x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
+            line=dict(color="black")  ))
+
+    if G.LineShow_FN:     
+        G.Fig1.add_trace(go.Line(
+            name="False Negative",
+            text="False Negative",
+            legendrank=6,
+            x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
+            line=dict(color="peru" ) ))
+ 
+    if G.LineShow_ACC:     
+        G.Fig1.add_trace(go.Line(
+            name="General Accuracy",
+            text="General Accuracy",
+            legendrank=7,
+            x=G.DataTable["Prevalence"], y=G.DataTable["ACC"], 
+            line=dict(color="orange")  ))
+    
+
+    # We don't need a vertical line at the prevalence of interest
+    # because the plotly hover text does a better and dynamic job
+    # of highlighting values of any statistic at any prevalence.    
+    # if G.LineShow_Prevint:      
+    #     # Add a vertical line at the prevalence of interest.
+    #     G.Fig1.add_vline(x=G.PrevInt,line_dash="dash", line_color="red") 
     
     # Adjust titles, grid, font etc.
     G.Fig1.update_layout(title="<b>Screening Test Statistics",title_x=0.5)
@@ -833,14 +862,31 @@ def Plot_Build_Plotly(): # Create our plot using Plotly
     G.Fig1.layout.plot_bgcolor = "white"
     G.Fig1.layout.margin = dict(t=12, b=10, l=0, r=0)
     
+    # Adjust the hover text or mouseover text.
+        # https://plotly.com/python/hover-text-and-formatting/
+        # Show hover values for all visible lines (aka traces).
+    G.Fig1.update_layout(hovermode="x unified")
+        # Alter the hovertext font..
+    G.Fig1.update_layout(
+        hoverlabel=dict(bgcolor="white",font_size=16,font_family="Rockwell") )
+        # Show vertical and horizontal hover lines.
+    G.Fig1.update_xaxes(showspikes=True)
+    G.Fig1.update_yaxes(showspikes=True)
+        # Specify what is shown on each hovertext line.
+    G.Fig1.update_traces(
+    hovertemplate="<br>".join(["At Prevalence: %{x:.4f}", "Value: %{y:.4f}"]))
+      
+  
     # Adjust the legend.
     G.Fig1.update_layout(legend_title_text="<b>Legend.")
+      # Place legend below the plot. 
+      # A legend on the side of the plot stretches the width of the plot.
     G.Fig1.update_layout(
       legend={"yanchor":"bottom","y":-0.25,"xanchor":"center","x":+0.10})
 
     # Adjust the axes tick marks.
-    # Since the range of prevalences on the xaxis varies we have
-    # to vary the tick frequency on the xaxis. 
+       # Since the range of prevalences on the xaxis varies we have
+       # to vary the tick frequency on the xaxis. 
     XtickIncrement = G.PrevEnd / 10
     G.Fig1.update_layout(xaxis = dict(tickmode = 'linear',
                                  tick0 = G.PrevStart, dtick = XtickIncrement))
@@ -851,7 +897,7 @@ def Plot_Build_Plotly(): # Create our plot using Plotly
     G.Fig1.update_layout(margin=dict(l=10, r=10, t=30, b=30),
                           paper_bgcolor="azure", ) 
  
-    return() # End of function:   Plot_Build_Plotly()
+    return() # End of function:   Plot_Build_Plotly_GO()
 
 def Plot_Build_Matplotlib():
     # Create a graph of Prevalence (x axis) vs various statistics.
@@ -1035,7 +1081,6 @@ def Title_Build(TitleLength = "long",formatfor="regular"):
     
     # If the text is intended for an html text target use the html line break.
     if formatfor == "streamlit":
-        print("SSSSSSSSSSSS")
         G.TitleText2 = G.TitleText2.replace("\n", "<br>")
     if TitleLength == "short":
         G.TitleText2 = G.TitleText1
@@ -1090,12 +1135,12 @@ def Static_Variables_Create():
 
     S.LineShow_FPPercent = True
     S.LineShow_FNPercent = True
-    S.LineShow_PPV = True
-    S.LineShow_NPV = True
-    S.LineShow_FP = True
-    S.LineShow_FN = True
-    S.LineShow_ACC = True
-    S.LineShow_PREVI = True
+    S.LineShow_PPV = False
+    S.LineShow_NPV = False
+    S.LineShow_FP = False
+    S.LineShow_FN = False
+    S.LineShow_ACC = False
+    S.LineShow_PREVI = False
     
 
     
