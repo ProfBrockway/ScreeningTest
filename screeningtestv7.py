@@ -779,43 +779,43 @@ def Plot_Build_Plotly(): # Create our plot using Plotly
     # We add the lines(aka traces) to the plot that the user has requested.
     if G.LineShow_PPV:  
         G.Fig1.add_trace(go.Line(
-            name="PPV: Positive Predictive Value.",
+            name="Positive Predictive Value (PPV)",
             x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
             line=dict(color="orange"  )   ))
 
     if G.LineShow_NPV:   
         G.Fig1.add_trace(go.Line(
-            name="NPV: Negative Predictive Values.",
+            name="Negative Predictive Values (NPV)",
             x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
             line=dict(color="magenta")  ))
 
     if G.LineShow_FP:    
         G.Fig1.add_trace(go.Line(
-            name="FP False Positive",
+            name="False Positive (FP)",
             x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
             line=dict(color="black")  ))
 
     if G.LineShow_FN:     
         G.Fig1.add_trace(go.Line(
-            name="FN:  False Negative",
+            name="False Negative (FN)",
             x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
             line=dict(color="peru" ) ))
  
     if G.LineShow_ACC:     
         G.Fig1.add_trace(go.Line(
-            name="ACC: General Accuracy !",
+            name="General Accuracy (ACC)",
             x=G.DataTable["Prevalence"], y=G.DataTable["ACC"], 
             line=dict(color="green")  ))
     
     if G.LineShow_FPPercent:     
         G.Fig1.add_trace(go.Line(
-            name="FPPercent: False Positive Percentage",
+            name="False Positive Percentage (FPPercent)",
             x=G.DataTable["Prevalence"], y=G.DataTable["FPPercent"], 
             line=dict(color="red")  )) 
         
     if G.LineShow_FNPercent:      
         G.Fig1.add_trace(go.Line(
-            name="FNPercent: False Negative Percentage",
+            name="False Negative Percentage (FNPercent)",
             x=G.DataTable["Prevalence"], y=G.DataTable["FNPercent"], 
             line=dict(color="blue")  ))     
         
