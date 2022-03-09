@@ -6,52 +6,22 @@ r"""
 # TO DO
         
 	- get rid of explicit declaration of static variables. let the key= do the creation ?	
-
-    - Solve the view PDF documentaion problem. See the other todo doc.
- 
-    - Add a slider for the prevint ?
     
     -  Create documentation including a documentation vidio and deploy it
         - https://docs.python-guide.org/writing/documentation/
-
-    - database ? any backend easy? what about that none backend one
-      presumably a web url call.
-       
-     - security error
-       Patched release and documentation
-        See https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0-1-cve-2022-21699,
-        
-        Version 8.0.1, 7.31.1 for current Python version are recommended.
-        Version 7.16.3 has also been published for Python 3.6 users,
-        Version 5.11 (source only, 5.x branch on github) for older Python versions.
-    
-    - WARNING: You are using pip version 22.0.3; however, version 22.0.4 is available.
-            To install a particular version (say earlier) pip install pip==1.2.1
-            
+                   
     # For final submission.
+    #  - spell check comments to get rid of gross errors.
     # - check results carefully.
     # - create an actual test case of a specific covid screening test.
 """
 
-# IDE USED TO DEVELOP THIS CODE
-# - Python: Version: 3.9.7
-# - Ipython: Version: 7.29.0  :
-       # security issue. Recommend upgrading ipython to version 7.31.1
-       # https://github.com/ProfBrockway/ScreeningTest/security/dependabot/2
-# - Anaconda: Version: 4.11.0
-# - Spyder: # Name             Version        Build  Channel
-#             pyls-spyder      0.4.0          pyhd3eb1b0_0
-#             spyder           5.1.5          py39haa95532_1
-# - O/S: Windows 10
-# - pip: 21.2.4 from C:\Users\Brock\anaconda3\lib\site-packages\pip(python 3.9)
-#
-import sys
 
 import os
 import streamlit as st
 from streamlit import session_state as S
 import pandas as pd
-import matplotlib as mpl  
+import matplotlib as mpl    # We may use both matplotlib and plotly
 
 # Plotly imports. Some may be flagged as unused, but import them anyway.
 import scipy # Used by plotly figure factory behind the scenes.
@@ -508,8 +478,8 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
     #   on the left and a plot and display area on the right.
     #
-    #   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # - !!!!! DON"T ADD A "value=" parameter to any input widget. !!!!!!
+    #   !!
+    # - !!!!! DON"T ADD A "value=" parameter to any streamlit widget. !!!!!!
     #      The "val=" causes error messages about duplicate initialization.
     #       Instead let the static variable created by the key= parameter
     #       do the work.
@@ -534,7 +504,8 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             label="INSTRUCTIONS",
             height=None,
             max_chars=None,
-            help="This box offers instructions and reports errors in input.",
+            help="""The instructions box offers instructions and reports errors
+                    in input.""",
             on_change=None)
 
         # Add a form submit button.
@@ -542,8 +513,8 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         st.form_submit_button(
                     label='Plot Now',
                     on_click=PlotNowButton_Click_Event,
-                    help="When you have entered the parameters  \r"
-                    "for the calculations click this  \r"
+                    help="When you have entered the parameters  \r  "
+                    "for the calculations click this  \r  "
                     "button to draw your plot.",
                     args=(),
                     kwargs=())
@@ -555,12 +526,12 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             label="Population",
             min_value=1,
             max_value=1000,
-            step=None,
+            step=1,
             format="%i",
-            help="Enter the population.[100,1000]. "
-                 "Population does not effect  "
-                 "the results which are all percentages of population. "
-                 "Changing Population changes the number of data points. ",
+            help="""Enter the population.[100,1000].   
+            Population does not effect the results which are all percentages 
+            of population.   
+            Changing Population changes only the number of data points.""",
             on_change=None,
             args=None,
             kwargs=None,
@@ -573,9 +544,9 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.0,
             step=0.01,
-            format="%f",
-
-            help="Enter the tests' Sensitivity. [ 0, 1]",
+            format="%.4f", 
+            help="""Enter the tests' Sensitivity.    \r
+                   A decimal percentage [ 0, 1]""",
             on_change=None)
 
         # Input The Test Specificity.
@@ -585,8 +556,9 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.0,
             step=0.01,
-            format="%f",
-            help="Enter the tests' Specificity. [ 0, 1 ]",
+            format="%.4f",
+            help="""Enter the tests' Specificity.  
+            A decimal percentage [ 0, 1 ]""",
             on_change=None)
 
         # Input the start of the range of prevalences to be tested.
@@ -596,9 +568,10 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=0.99,
             step=0.01,
-            format="%f",
-            help="Enter the start of the range of prevalence "
-                "to be plotted. [ 0, 0.99 ]",
+            format="%.4f",
+            help="""Enter the start of the range of prevalence
+                to be plotted.  
+                A decimal percentage [ 0, 0.99 ]""",
             on_change=None)
 
         # Input the end of the range of prevalences to be tested.
@@ -608,9 +581,9 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.00,
             step=0.01,
-            format="%f",
-            help="Enter the end of the range of prevalences to be plotted."
-                  " [ 0.01, 1 ]",
+            format="%.4f",
+            help="""Enter the end of the range of prevalences to be
+            plotted.  \rA decimal percentage [ 0.01, 1 ]""",
             on_change=None)
 
         # Input the prevalence of interest to be highlighted on the plot
@@ -620,17 +593,16 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.00,
             step=0.01,
-            format="%f",
-            help="Enter the prevalence of number_input. "
-                  "A vertucal line will highlight"
-                  " the values at the requested prevalence. [ 0.0,  1 ]",
+            format="%.4f",
+            help=("""Enter the prevalence of interest.   
+                  A vertical line will highlight
+                  the values at the requested prevalence.    
+                  A decimal percentage  [ 0.0,  1 ]"""),
             on_change=None)
  
-        # Add checkboxes for selecting the lines to be shown on plot.
-        
-
-
-
+        # End of "With Form"
+    
+    st.info("🟢 MEDICAL SCREENING TEST CALCULATOR")   
     return()  # End of function: GUI_Build_Basic_Layout
 
 def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
@@ -660,12 +632,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                     config={'displayModeBar': True}, # Force plotly toolbar.
                     sharing="streamlit")
     
-    # Build the plot using Plotly Express (not plotly G) [Graph Objects]).
-    Plot_Build_Plotly_EX()    
-    st.plotly_chart(G.Fig2, 
-                    use_container_width=True, 
-                    config={'displayModeBar': True}, # Force plotly toolbar.
-                    sharing="streamlit")
+
     
     ###########################################################################
     # +++ MAKE THIS APPS DOCUMENTATION AVAILABLE.
@@ -705,7 +672,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
-    st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS")
+    st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS.")
     st.dataframe(data=G.DataTable, width=None, height=None)
 
     #  +++ ADD A "DOWNLOAD" DATAFRAME BUTTON.
@@ -871,14 +838,17 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
         
     # Adjust the hover text aka "mouseover" text.
     # Show hover values for all visible lines (aka traces).
-    G.Fig1.update_layout(hovermode="x") # Also "x unified" or "closest"
+    G.Fig1.update_layout(hovermode="x") # "x", "x unified" or "closest"
     # Show vertical and horizontal hover axes intersect lines.
-    G.Fig1.update_xaxes(showspikes=True)
-    G.Fig1.update_yaxes(showspikes=True)
+    G.Fig1.update_xaxes(showspikes=True, spikecolor="green",spikethickness=1, 
+                        spikesnap="cursor", spikemode="across")
+    G.Fig1.update_yaxes(showspikes=True, spikecolor="green", spikethickness=1)
     # Specify what is shown on each hovertext line.
-    G.Fig1.update_traces(
-    hovertemplate="<br>".join(["at Prevalence: %{x:.4f}","Value: %{y:.4f}"]))
-    # Alter the hovertext font.  
+    # https://plotly.com/python/hover-text-and-formatting/#advanced-hover-template
+   
+    HT=("<br>" + "At Prevalence=%{x:.4f},  " + "Test Value=%{y:.4f}") 
+    G.Fig1.update_traces(hovertemplate=HT)
+    # Adjust the hovertext font.  
     G.Fig1.update_layout(hoverlabel=dict(font_size=12,bgcolor="palegreen")) 
   
     # Adjust the legend.
@@ -932,57 +902,6 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
     #         bordercolor="black", borderwidth=0)
         
     return() # End of function:   Plot_Build_Plotly_GO()
-
-def Plot_Build_Plotly_EX():  #?V
-   
-    G.Fig2 = px.line(G.DataTable, 
-       x="Prevalence", 
-       y=[
-           "FPPercent",
-          "FNPercent",
-          "PPV",
-          "NPV",
-          "FP",
-          "FN",
-          "ACC",
-         ],
-       color_discrete_map={
-          "FPPercent": "red",
-          "FNPercent": "blue",
-          "PPV": "green",
-          "NPV": "magenta",
-          "FP": "black",
-          "FN": "peru",
-          "ACC": "orange"
-                      },
-       labels={
-          "FPPercent": "False Positive Percent",
-          "FNPercent": "False Negative Percent",
-          "PPV": "green",
-          "NPV": "magenta",
-          "FP": "black",
-          "FN": "peru",
-          "ACC": "orange"
-          },
-
-       template="simple_white"
-       )
-    
-    NewLabels={
-          "FPPercent": "False Positive Percent",
-          "FNPercent": "False Negative Percent",
-          "PPV": "Positive Predictive Value",
-          "NPV": "Negative Predictive Vallue",
-          "FP": "False Positive",
-          "FN": "False Negative",
-          "ACC": "Overall Accuracy"
-          },
-
-    
-    
-    
-    return()  # End of function: Plot_Build_Plotly_EX().
-
 
 def Plot_Report_Build(TitleLength = "long",formatfor="regular"):
     G.Plot_Report_Short = str(
