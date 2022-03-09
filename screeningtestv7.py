@@ -35,7 +35,10 @@ r"""
 
 # IDE USED TO DEVELOP THIS CODE
 # - Python: Version: 3.9.7
-# - Anaconda:  4.11.0
+# - Ipython: Version: 7.29.0  :
+       # security issue. Recommend upgrading ipython to version 7.31.1
+       # https://github.com/ProfBrockway/ScreeningTest/security/dependabot/2
+# - Anaconda: Version: 4.11.0
 # - Spyder: # Name             Version        Build  Channel
 #             pyls-spyder      0.4.0          pyhd3eb1b0_0
 #             spyder           5.1.5          py39haa95532_1
