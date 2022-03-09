@@ -17,13 +17,33 @@ r"""
     - database ? any backend easy? what about that none backend one
       presumably a web url call.
        
-     - 
+     - security error
+       Patched release and documentation
+        See https://ipython.readthedocs.io/en/stable/whatsnew/version8.html#ipython-8-0-1-cve-2022-21699,
+        
+        Version 8.0.1, 7.31.1 for current Python version are recommended.
+        Version 7.16.3 has also been published for Python 3.6 users,
+        Version 5.11 (source only, 5.x branch on github) for older Python versions.
     
+    - WARNING: You are using pip version 22.0.3; however, version 22.0.4 is available.
+            To install a particular version (say earlier) pip install pip==1.2.1
+            
     # For final submission.
     # - check results carefully.
     # - create an actual test case of a specific covid screening test.
 """
- 
+
+# IDE USED TO DEVELOP THIS CODE
+# - Python: Version: 3.9.7
+# - Anaconda:  4.11.0
+# - Spyder: # Name             Version        Build  Channel
+#             pyls-spyder      0.4.0          pyhd3eb1b0_0
+#             spyder           5.1.5          py39haa95532_1
+# - O/S: Windows 10
+# - pip: 21.2.4 from C:\Users\Brock\anaconda3\lib\site-packages\pip(python 3.9)
+#
+import sys
+
 import os
 import streamlit as st
 from streamlit import session_state as S
@@ -52,6 +72,7 @@ class Global_Variables():  # A class creating all global variables.
     ThisModule_FullPath  = os.path.abspath(__file__)
     ThisModule_FileName = os.path.basename(ThisModule_FullPath)
     ThisModule_ProjectPath = os.path.dirname(ThisModule_FullPath)
+  
     
     # +++ RESOURCE LINKS Etc  Pictures/Videos/Files etc stored online.
     #   Where possible we base our resources in this apps repostitory
