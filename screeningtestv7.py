@@ -4,14 +4,20 @@ r"""
 # streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
 
 # TO DO
-    # - Solve the view PDF documentaion problem. See the other todo doc.
-    # Why are  plotky line legend renames NOT working ?
-    #   get help/about menu to show spaces. markdown is just eliminating all extra spaces.
+        
+	- get rid of explicit declaration of static variables. let the key= do the creation ?	
 
-    # - Move the "plot lines to be shown" selector to the right pane.
-    # - Add a slider for the prevint ?
-    # - Create documentation including a documentation vidio and deploy it
-    #    - https://docs.python-guide.org/writing/documentation/
+    - Solve the view PDF documentaion problem. See the other todo doc.
+ 
+    - Add a slider for the prevint ?
+    
+    -  Create documentation including a documentation vidio and deploy it
+        - https://docs.python-guide.org/writing/documentation/
+
+    - database ? any backend easy? what about that none backend one
+      presumably a web url call.
+       
+     - 
     
     # For final submission.
     # - check results carefully.
@@ -31,15 +37,16 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
+
 class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
     # +++ DETAILS ABOUT THIS MODULE
     ThisModule_Project = "Medical Screening Tests Efficacy."
-    ThisModule_Version = "7_00     2022 March 3, 10.29 am EST."  
+    ThisModule_Version = "7_01   2022 March 9."  
     ThisModule_About = "For a course Spring 2022. "  
     ThisModule_Author = "TB, UConn Math Dept."
     ThisModule_Purpose = ("To demonstrate the effect of disease prevalence " 
-                         "on medical screening tests.")
+                         "on the reliability of medical screening tests.")
     ThisModule_Contact = "Contacts not supplied."
     ThisModule_Docstring = (__doc__)
     ThisModule_FullPath  = os.path.abspath(__file__)
@@ -183,20 +190,13 @@ class Global_Variables():  # A class creating all global variables.
     Plot2 = None
     Msg01 =  "Enter the parameters of the medical screening test "\
              "and click 'Plot Now' button."
-    TitleText1 = None
-    TitleText2 = None
+    Plot_Report_Short = None
+    Plot_Report_Long = None
     False_Pos_Message = None
     False_Neg_Message = None    
 
-    # Switches to show or not show each plot line per users request.
-    LineShow_PPV = None
-    LineShow_FPPercent = None
-    LineShow_NPV = None
-    LineShow_FNPercent = None
-    LineShow_FP = None
-    LineShow_FN = None
-    LineShow_ACC = None
-    LineShow_Prevint = None
+ 
+    
 # End of Global Variables
 G = Global_Variables()    # Instantiate our global variables.
 
@@ -214,12 +214,14 @@ def MainLine():
 
     else:  # We are responding to a session reply from the user.
         S.Display_Count += 1  # Count of sessions.
+        
         # Initalize variables for every run.
         #   Remember nothing outside the Streamlit Static/persistant dictionary
         #   is preserved across sessions. So we perform the one time
         #   program initialization once then perform the "every run"
-        #   intialization.
+        #   Initialization.
         Initialization_Perform_EveryRun()
+        
         # Validate and internalize users'input.
         InputOK = User_Input_Validate_And_Internalize()
         if InputOK == True:
@@ -242,7 +244,7 @@ def Initialization_Perform_EveryRun():
     #   the streamlit static "session_state" dictionary.
     #  
     #   On the first run we perform the one time program initialization.
-    #   On subsequent runs we perform the "every run" intialization to 
+    #   On subsequent runs we perform the "every run" Initialization to 
     #   initialize or reinitialize anything not preserved across 
     #   the display/response dialog.
     # 
@@ -259,7 +261,8 @@ def Initialization_Perform_EveryRun():
     # Also its less vulnerable to the subtle misbehaviors of alternatives
     # (1) and (2).
  
-    # In this case all initialization is done in class Global_Variables.
+
+    
  
     return()
 
@@ -274,7 +277,7 @@ def Initialization_Perform_First_Load_Only():
        
     # Static variables are static, persistant and global.  
     Static_Variables_Create() 
-    
+       
     return()  # End of function: Initialization_Perform_First_Load_Only
 
 def User_Input_Validate_And_Internalize():
@@ -348,19 +351,9 @@ def User_Input_Validate_And_Internalize():
        Msg_Set("Error 1030: Prevalence Of Interest "\
                 "must lie between Prevalence Start and Prevalence End.")
        return(False)
-                 
-   # Internalize checkbox options. Show / Hide the plot lines.
-    G.LineShow_FPPercent = S.LineShow_FPPercent 
-    G.LineShow_FNPercent = S.LineShow_FNPercent
-    G.LineShow_PPV = S.LineShow_PPV 
-    G.LineShow_NPV = S.LineShow_NPV 
-    G.LineShow_FP = S.LineShow_FP 
-    G.LineShow_FN = S.LineShow_FN
-    G.LineShow_ACC = S.LineShow_ACC
-    G.LineShow_PrevInt = S.LineShow_PREVI 
-    
+ 
     # If we fall through here the users input is all valid.
-    S.MsgText = G.Msg01    # The "Please enter test specs" message.
+    S.MsgText = G.Msg01    # Reset the "Please enter test specs" message.
     return(True)  # End of function: User_Input_Validate_And_Internalize
 
 def User_Input_Process():
@@ -463,17 +456,23 @@ def User_Input_Process():
         if (PrevCurrent >= G.PrevInt) and (G.False_Pos_Message == "" ):
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FPPercent = G.FPPercent # Save the FP percentage.
-            G.False_Pos_Message = str("{:.3f}".format(G.FPPercent * 100) + 
-                "% of all positives are false at a prevalence of " +
-                "{:.6f}".format(G.PrevInt ) + "."  )
-        
-        # Find the percentage of negatives that is false.
+            G.False_Pos_Message = (
+                "About " + 
+                str( "{:.2f}".format(G.FPPercent * 1)) + 
+                " of all positives are false at a prevalence of " +
+                "{:.6f}".format(G.PrevInt) + 
+                "."                )            
+                         
+         # Find the percentage of negatives that is false.
         if (PrevCurrent >= G.PrevInt) and (G.False_Neg_Message == "" ):
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FNPercent = G.FNPercent  # Save the FN percentage.
-            G.False_Neg_Message = str("{:.3f}".format(G.FNPercent * 100) + 
-                "% of all negatives are false at a prevalence of " +
-                "{:.6f}".format(G.PrevInt ) + "."  )
+            G.False_Neg_Message =(
+                "About " + 
+                str( "{:.2f}".format(G.FNPercent * 1)) + 
+                " of all negatives are false at a prevalence of " +
+                "{:.6f}".format(G.PrevInt) + 
+                "."                )     
         
         G.DataTable = G.DataTable.append(newrow, ignore_index=True)
     
@@ -485,8 +484,11 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
     #   on the left and a plot and display area on the right.
     #
+    #   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # - !!!!! DON"T ADD A "value=" parameter to any input widget. !!!!!!
     #      The "val=" causes error messages about duplicate initialization.
+    #       Instead let the static variable created by the key= parameter
+    #       do the work.
     #
     #  - Widget values are stored in "linked" streamlit persistent variables.
     #     The value input/output to/from each widget is stored in/retrieved 
@@ -602,45 +604,8 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
  
         # Add checkboxes for selecting the lines to be shown on plot.
         
-        # !! Don't add a value= parameter. This would cause the streamlit
-        #    bug "Did you forget to initialize".
-        # Instead let the static variable created by the key= parameter
-        # do the work.
-        st.checkbox(key="LineShow_FPPercent", 
-           # Intial and subsequent values are in key S.LineShow_FPPercent.         
-           label="Show the False Positive Percent line.",
-           help="FPPercent: The percentange of all postives that are false.")
-        st.checkbox(key="LineShow_FNPercent", 
-           # Intial and subsequent values are in key S.LineShow_FNPercent. 
-           label="Show the False Negative Percent line.",
-           help="FNPercent: The percentange of all negatives that are false.")
-        st.checkbox(key="LineShow_PPV",
-           # Intial and subsequent values are in key S.LineShow_PPV.         
-           label="Show the PPV line.", 
-           help="PPV: The positive predictive value")
-        st.checkbox(key="LineShow_NPV",
-           # Intial and subsequent values are in key S.LineShow_NPV.  
-           label="Show the NPV line..",
-           help="NPV: The negative predictive value")
-        st.checkbox(key="LineShow_FP",
-           # Intial and subsequent values are in key S.LineShow_FP. 
-           label="Show the FP line.", 
-           help="FP: False Positive")
-        st.checkbox(key="LineShow_FN",
-           # Intial and subsequent values are in key S.LineShow_FN.         
-           value=G.LineShow_FN,         
-           label="Show the FN line.", 
-           help="FN: False Negative")
-        st.checkbox(key="LineShow_ACC",
-           # Intial and subsequent values are in key S.LineShow_ACC.         
-           value=G.LineShow_ACC,         
-           label="Show the General Accuracy line.", 
-           help="ACC: General Accuracy")
-        st.checkbox(key="LineShow_PREVI",
-           # Intial and subsequent values are in key S.LineShow_PrevI.         
-           value=G.LineShow_Prevint,         
-           label="Show the PrevInt line..",
-           help="PrevInt: A vertical line at the prevalence of interest.")
+
+
 
     return()  # End of function: GUI_Build_Basic_Layout
 
@@ -648,16 +613,35 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     ###########################################################################
     # +++ BUILD THE PLOT REQUESTED BY THE USER AND PLACE IT ON THE GUI.
-    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
-    Plot_Build_Plotly_GO()  # Use Plotly to create graphs. 
-    st.text(Title_Build(formatfor="regular")) # Display a title box.
-    # Place the Plotly plot on the Streamlit page.
-    st.plotly_chart(G.Fig1, use_container_width=False, sharing="streamlit")
+    # Increase the visibility of the Streamlit "full page" icon.
+    Plot_Streamlit_FullScreenIcon_Format()
+     
+    # Build the plot using Plotly graph objects (GO)(not plotly express).
+    Plot_Build_Plotly_GO()    
     
-    # Do the same plot using matplotlib.
-    Plot_Build_Matplotlib()  # Use Plotly to create graphs. 
-    # Place the Matplotlib plot on the Streamlit page.
-    st.pyplot(G.Fig2) # For a Matplotlib created plot.
+    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
+    
+    # Display a Plot Report box on the GUI.
+    st.text(Plot_Report_Build(formatfor="regular")) 
+        
+    # Place the Plotly plot on the GUI.
+    #  use_container_width
+    #      If True, set the chart width to the column width. 
+    #     This takes precedence over the figure's native width value.
+    #     Don't set height or width anywhere. Let Streamlit and Plotly
+    #     scale everything. Otherwise the GUI won't adjust properly to
+    #     different size screens.
+    st.plotly_chart(G.Fig1, 
+                    use_container_width=True, 
+                    config={'displayModeBar': True}, # Force plotly toolbar.
+                    sharing="streamlit")
+    
+    # Build the plot using Plotly Express (not plotly G) [Graph Objects]).
+    Plot_Build_Plotly_EX()    
+    st.plotly_chart(G.Fig2, 
+                    use_container_width=True, 
+                    config={'displayModeBar': True}, # Force plotly toolbar.
+                    sharing="streamlit")
     
     ###########################################################################
     # +++ MAKE THIS APPS DOCUMENTATION AVAILABLE.
@@ -696,7 +680,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
 
     
     ###########################################################################
-    # +++ Show the DataTable.
+    # +++ SHOW THE DATATABLE.
     st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS")
     st.dataframe(data=G.DataTable, width=None, height=None)
 
@@ -730,16 +714,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #  So until I can figure out how to base videos at github we use Youtube.
     st.info("🟢  A VIDEO DEMONSTRATING THIS APP'S FEATURES.")   
     st.video(G.Link20)
-
-
-    ###########################################################################
-    
-    st.subheader("Debugging Information Follows.")
-    st.caption(" The streamlit st.session_state persistant/static "
-               "variables follow.") 
-    st.write(S)    #  Show all streamlit persistent variables dictionary.
-        
- 
+   
     return  # End of function: GUI_Right_Panel_Build
 
 def GUI_HelpMenu_Build():
@@ -788,206 +763,245 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
     
     # Plot all graph lines on one axis.
     # We add the lines(aka traces) to the plot that the user has requested.
-    if G.LineShow_FPPercent:     
-        G.Fig1.add_trace(go.Line(
-            name="False Positive Percentage", # Shows in Legend.
-            text="False Positive Percentage", # Shows in Hovertext.
-            legendrank=1, # Where the line will appear in the legend list.
-            x=G.DataTable["Prevalence"], y=G.DataTable["FPPercent"], 
-            line=dict(color="red")  )) 
-        
-    if G.LineShow_FNPercent:      
-        G.Fig1.add_trace(go.Line(
-            name="False Negative Percentage",
-            text="False Negative Percentage",
-            legendrank=2,
-            x=G.DataTable["Prevalence"], y=G.DataTable["FNPercent"], 
-            line=dict(color="blue")  ))     
+     
+    G.Fig1.add_trace(go.Scatter(
+        name="False Positive Percentage", # Shows in Legend.
+        text="False Positive Percentage", # Shows in Hovertext.
+        legendrank=1, # Where the line will appear in the legend list.
+        x=G.DataTable["Prevalence"], y=G.DataTable["FPPercent"], 
+        visible=True,
+        mode="lines",
+        line=dict(color="red")  )) 
+   
+    G.Fig1.add_trace(go.Scatter(
+        name="False Negative Percentage",
+        text="False Negative Percentage",
+        legendrank=2,
+        x=G.DataTable["Prevalence"], y=G.DataTable["FNPercent"],
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="blue")  ))     
+
+    G.Fig1.add_trace(go.Scatter(
+        name="Positive Predictive Value",   
+        text="Positive Predictive Value",   
+        legendrank=3,
+        x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="green"  )   ))
+  
+    G.Fig1.add_trace(go.Scatter(
+        name="Negative Predictive Values",
+        text="Negative Predictive Values",
+        legendrank=4,
+        x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="magenta")  ))
+     
+    G.Fig1.add_trace(go.Scatter(
+        name="False Positive",
+        text="False Positive",
+        legendrank=6,
+        x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="black")  ))
+
+    G.Fig1.add_trace(go.Scatter(
+        name="False Negative",
+        text="False Negative",
+        legendrank=8,
+        x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
+        visible="legendonly",
+        line=dict(color="peru" ) ))
     
-    if G.LineShow_PPV:  
-        G.Fig1.add_trace(go.Line(
-            name="Positive Predictive Value",   
-            text="Positive Predictive Value",   
-            legendrank=3,
-            x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
-            line=dict(color="green"  )   ))
-
-    if G.LineShow_NPV:   
-        G.Fig1.add_trace(go.Line(
-            name="Negative Predictive Values",
-            text="Negative Predictive Values",
-            legendrank=4,
-            x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
-            line=dict(color="magenta")  ))
-
-    if G.LineShow_FP:    
-        G.Fig1.add_trace(go.Line(
-            name="False Positive",
-            text="False Positive",
-            legendrank=5,
-            x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
-            line=dict(color="black")  ))
-
-    if G.LineShow_FN:     
-        G.Fig1.add_trace(go.Line(
-            name="False Negative",
-            text="False Negative",
-            legendrank=6,
-            x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
-            line=dict(color="peru" ) ))
- 
-    if G.LineShow_ACC:     
-        G.Fig1.add_trace(go.Line(
-            name="General Accuracy",
-            text="General Accuracy",
-            legendrank=7,
-            x=G.DataTable["Prevalence"], y=G.DataTable["ACC"], 
-            line=dict(color="orange")  ))
+    G.Fig1.add_trace(go.Scatter(
+        name="General Accuracy",
+        text="General Accuracy",
+        legendrank=9,
+        x=G.DataTable["Prevalence"], y=G.DataTable["ACC"],
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="orange")  ))
     
 
-    # We don't need a vertical line at the prevalence of interest
+    # We don't really need a vertical line at the prevalence of interest
     # because the plotly hover text does a better and dynamic job
-    # of highlighting values of any statistic at any prevalence.    
-    # if G.LineShow_Prevint:      
-    #     # Add a vertical line at the prevalence of interest.
-    #     G.Fig1.add_vline(x=G.PrevInt,line_dash="dash", line_color="red") 
+    # of highlighting values of any statistic at any prevalence. 
+    # Add a vertical line at the prevalence of interest.
+    # G.Fig1.add_vline(x=G.PrevInt,line_dash="dash", line_color="red") 
     
     # Adjust titles, grid, font etc.
-    G.Fig1.update_layout(title="<b>Screening Test Statistics",title_x=0.5)
+    G.Fig1.update_layout(title="<b>Screening Test Statistics",title_x=0.4)
     G.Fig1.update_layout(xaxis_title="<b>Disease Prevalence In Population")
     G.Fig1.update_layout(yaxis_title="<b>Response Of The Screening Test")
     G.Fig1.update_xaxes(showgrid=True,gridcolor="lightgray")
     G.Fig1.update_yaxes(showgrid=True,gridcolor="lightgray")
-    G.Fig1.update_layout(autosize=False, width=800, height=800)
+    # We let the plot autosize so that it will best fit different
+    # size screens. 
+    G.Fig1.update_layout(autosize=True, width=None, height=None) #800*1100
     G.Fig1.layout.plot_bgcolor = "white"
-    G.Fig1.layout.margin = dict(t=12, b=10, l=0, r=0)
-    
-    # Adjust the hover text or mouseover text.
-        # https://plotly.com/python/hover-text-and-formatting/
-        # Show hover values for all visible lines (aka traces).
-    G.Fig1.update_layout(hovermode="x unified")
-        # Alter the hovertext font..
-    G.Fig1.update_layout(
-        hoverlabel=dict(bgcolor="white",font_size=16,font_family="Rockwell") )
-        # Show vertical and horizontal hover lines.
+    G.Fig1.layout.margin = dict(t=5, b=5, l=0, r=0)
+        
+    # Adjust the hover text aka "mouseover" text.
+    # Show hover values for all visible lines (aka traces).
+    G.Fig1.update_layout(hovermode="x") # Also "x unified" or "closest"
+    # Show vertical and horizontal hover axes intersect lines.
     G.Fig1.update_xaxes(showspikes=True)
     G.Fig1.update_yaxes(showspikes=True)
-        # Specify what is shown on each hovertext line.
+    # Specify what is shown on each hovertext line.
     G.Fig1.update_traces(
-    hovertemplate="<br>".join(["At Prevalence: %{x:.4f}", "Value: %{y:.4f}"]))
-      
+    hovertemplate="<br>".join(["at Prevalence: %{x:.4f}","Value: %{y:.4f}"]))
+    # Alter the hovertext font.  
+    G.Fig1.update_layout(hoverlabel=dict(font_size=12,bgcolor="palegreen")) 
   
     # Adjust the legend.
     G.Fig1.update_layout(legend_title_text="<b>Legend.")
-      # Place legend below the plot. 
-      # A legend on the side of the plot stretches the width of the plot.
     G.Fig1.update_layout(
-      legend={"yanchor":"bottom","y":-0.25,"xanchor":"center","x":+0.10})
-
+    legend=dict(
+        # title_font_family="Times New Roman",
+        font=dict(size=10),
+        # Make the legend transparent to minimize its obscuration of the plot.
+        bgcolor="rgba(0,0,0,0)", 
+        bordercolor="Black",
+        borderwidth=1 ))
+    # Place the legend at a desired location on the plot.
+    # The legend will sometimes obscure the plot.
+    # So we place it to the right of the plot.
+    # This reduces and reshapes the plot display itself.
+    # Fortunately the Plotly "full screen" option can be used to view the plot
+    # beautifully.
+    G.Fig1.update_layout(
+      legend={"yanchor":"middle","y":+ 0.50,"xanchor":"right","x":+1.35})
+    
+    
     # Adjust the axes tick marks.
        # Since the range of prevalences on the xaxis varies we have
        # to vary the tick frequency on the xaxis. 
-    XtickIncrement = G.PrevEnd / 10
+    XtickIncrement = (G.PrevEnd - G.PrevStart) / 10
     G.Fig1.update_layout(xaxis = dict(tickmode = 'linear',
-                                 tick0 = G.PrevStart, dtick = XtickIncrement))
+                         tick0 = G.PrevStart, dtick = XtickIncrement))
     G.Fig1.update_layout( yaxis = dict(tickmode = 'linear',
-                                  tick0 = 0, dtick = 0.1))
+                          tick0 = 0, dtick = 0.1))
         
     # Add border around the plot. #,ivory,linen,mintcream,snow,whitesmoke
-    G.Fig1.update_layout(margin=dict(l=10, r=10, t=30, b=30),
-                          paper_bgcolor="azure", ) 
- 
+    G.Fig1.update_layout(
+        margin=dict(l=10, r=10, t=30, b=30), paper_bgcolor="mintcream", ) 
+    G.Fig1.update_xaxes(showline=True,  linecolor='black', mirror=True)
+    G.Fig1.update_yaxes(showline=True, linewidth=1, linecolor='black', mirror=True)
+    
+    # Add a documentation text box to the plot.
+    #  This works if you make the plot area big enough to put the
+    #  document box under the plot. (See width/height above.)
+    #  But if we don't autosize the plot it won't adjust to different size
+    #  screens. So we avoid any feature that sets absolute size for anything.
+    
+    # G.Fig1.add_annotation(
+    #     text=Plot_Report_Build(formatfor="streamlit"), 
+    #         align="left",
+    #         showarrow=False,
+    #         xref="paper", yref="paper",
+    #         x= 0.40, xanchor = "left",
+    #         y=-0.25, yanchor = "bottom",
+    #         bordercolor="black", borderwidth=0)
+        
     return() # End of function:   Plot_Build_Plotly_GO()
 
-def Plot_Build_Matplotlib():
-    # Create a graph of Prevalence (x axis) vs various statistics.
-    # Here we actually build the plot with multiple graph lines.
-    # The user has specified which lines to include.
+def Plot_Build_Plotly_EX():  #?V
+   
+    G.Fig2 = px.line(G.DataTable, 
+       x="Prevalence", 
+       y=[
+           "FPPercent",
+          "FNPercent",
+          "PPV",
+          "NPV",
+          "FP",
+          "FN",
+          "ACC",
+         ],
+       color_discrete_map={
+          "FPPercent": "red",
+          "FNPercent": "blue",
+          "PPV": "green",
+          "NPV": "magenta",
+          "FP": "black",
+          "FN": "peru",
+          "ACC": "orange"
+                      },
+       labels={
+          "FPPercent": "False Positive Percent",
+          "FNPercent": "False Negative Percent",
+          "PPV": "green",
+          "NPV": "magenta",
+          "FP": "black",
+          "FN": "peru",
+          "ACC": "orange"
+          },
+
+       template="simple_white"
+       )
     
-    # Create a Matplotlib figure.
-    G.Fig2 = mpl.figure.Figure()
+    NewLabels={
+          "FPPercent": "False Positive Percent",
+          "FNPercent": "False Negative Percent",
+          "PPV": "Positive Predictive Value",
+          "NPV": "Negative Predictive Vallue",
+          "FP": "False Positive",
+          "FN": "False Negative",
+          "ACC": "Overall Accuracy"
+          },
 
-    # Create a plot object within the main figure.
-    # Any previous plot has already been destroyed before calling this func. 
-    G.Plot2 = G.Fig2.add_subplot(111)
     
-    G.Plot2.clear()  # Clear any current plot in Plot1. Just to be sure.
-
-    # The x axis will be the population prevalence values.
-    PrevXData = G.DataTable[('Prevalence')]
-
-    # Set values for plotting Prevalence vs PPV as a percent value.
-    PPV_yData = G.DataTable[('PPV')]
-
-    # Set values for plotting Prevalence vs NPV as a percent value.
-    NPV_ydata = G.DataTable[('NPV')]
-
-    # Set values for False positive line.
-    FP_yData = G.DataTable[('PPV')]
-    FP_yData = 1 - PPV_yData[:]
-
-    # Set values for False Negative  line.
-    FN_yData = G.DataTable[('NPV')]
-    FN_yData = 1 - NPV_ydata[:]
-
-    # Set values for plotting Prevalence vs 'Accuracy' as a percent value.
-    Acc_ydata = G.DataTable[('ACC')]
-
-    # Plot all graph lines on one axis.
-       # But first check which lines the user wants displayed.
-             
-    if G.LineShow_PPV:  
-        G.Plot2.plot(PrevXData, PPV_yData, 
-                     label = "PPV: Positive Predictive Value",
-                     color = "magenta" )
-                        
-    if G.LineShow_NPV:   
-        G.Plot2.plot(PrevXData, NPV_ydata, 
-                     label = "NPV: Negative Predictive Value",
-                     color = "black" )
-        
-    if G.LineShow_FP:    
-        G.Plot2.plot(PrevXData, FP_yData,
-                     label = "FP: False Positives",
-                     color = "pink")
- 
-    if G.LineShow_FN:             
-        G.Plot2.plot(PrevXData, FN_yData,
-                     label = "False Negatives",
-                     color = "gray" )
-        
-    if G.LineShow_ACC:          
-        G.Plot2.plot(PrevXData, Acc_ydata,
-                     label = "ACC: General Accuracy",
-                     color = "black" )
     
-    if G.LineShow_FPPercent:          
-        G.Plot2.plot(PrevXData, G.DataTable["FPPercent"],
-                     label = "FPPercent: False Positives Percentage",
-                     color = "green" )
+    
+    return()  # End of function: Plot_Build_Plotly_EX().
 
-    if G.LineShow_FNPercent:          
-        G.Plot2.plot(PrevXData, G.DataTable["FNPercent"],
-                     label = "FNPercent: False Positives Percentage",
-                     color = "blue" )
-    
-    if G.LineShow_FNPercent:  
-        # Plot a vertical line at the prevalence of interest.
-        G.Plot2.axvline(x = G.PrevInt,
-                       label = "PrevInt:  Prevalence Of Interest", 
-                       color = "green", 
-                       ls="--")
-    
 
-    G.Plot2.minorticks_on()
-    G.Plot2.legend(loc="best",fontsize=14,prop={"weight":"bold"}) # 
-    G.Plot2.set_title(Title_Build(formatfor="regular"),
-                      fontsize=10,fontweight="bold" )  
-    G.Plot2.grid(visible=True, which='major', axis="both")
-    G.Plot2.set_xlabel("Prevalence In Population (%)")
-    G.Plot2.set_ylabel("Statistics' Value")
+def Plot_Report_Build(TitleLength = "long",formatfor="regular"):
+    G.Plot_Report_Short = str(
+                   "\n\nScreening Test Statistics \n" +
+                   "As The Disease Population Prevalence Varies From " +
+                   "{:.5f}".format(G.PrevStart)  +
+                   " To {:.5f}".format(G.PrevEnd) + "."
+                           )
+   
+    G.Plot_Report_Long =  G.Plot_Report_Short + "  \n" + str(
+      "Population = {:,}   \n".format(G.PopSize) +
+      "Sensitivity = {:.4f}   \n".format(G.Sens) +
+      "Specificity = {:.4f}   \n".format(G.Spec) +
+      "Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
+      "Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
+      "Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
+      G.False_Pos_Message + "  \n" +
+      G.False_Neg_Message
+                                                ) 
     
-    return() # End of function: Plot_Build_Matplotlib().
+    # If the text is intended for an html text target use the html line break.
+    if formatfor == "streamlit":
+        G.Plot_Report_Long = G.Plot_Report_Long.replace("\n", "<br>")
+    if TitleLength == "short":
+        G.Plot_Report_Long = G.Plot_Report_Short
+    
+    return(G.Plot_Report_Long)   #  End of function: Plot_Report_Build
+
+def Plot_Streamlit_FullScreenIcon_Format():
+    # This function increases the visibility of the Streamlit
+    # full page icon..
+    style_fullscreen_button_css = """
+         button[title="View fullscreen"] 
+         {background-color: #004170cc; left: 2; color: white; }
+    
+         button[title="View fullscreen"]:hover 
+         {background-color: #004170; color: white; } """
+    
+    st.markdown( "<style>" 
+                + style_fullscreen_button_css
+                + "</styles>",
+                unsafe_allow_html=True,
+               )
 
 def PlotNowButton_Click_Event():
     # Not used.
@@ -1060,33 +1074,6 @@ def StMarkdown(TextToBeFormated="", color="black",
                )
     return(md)  # End of function: StMarkdown
 
-def Title_Build(TitleLength = "long",formatfor="regular"):
-    G.TitleText1 = str(
-                   "\n\nScreening Test Statistics \n" +
-                   "As The Population Prevalence Varies From " +
-                   "{:.5f}".format(G.PrevStart)  +
-                   " To {:.5f}".format(G.PrevEnd) + "."
-                           )
-   
-    G.TitleText2 =  G.TitleText1 + "  \n" + str(
-      "Population = {:,}   \n".format(G.PopSize) +
-      "Sensitivity = {:.4f}   \n".format(G.Sens) +
-      "Specificity = {:.4f}   \n".format(G.Spec) +
-      "Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
-      "Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
-      "Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
-      G.False_Pos_Message + "  \n" +
-      G.False_Neg_Message
-                                                ) 
-    
-    # If the text is intended for an html text target use the html line break.
-    if formatfor == "streamlit":
-        G.TitleText2 = G.TitleText2.replace("\n", "<br>")
-    if TitleLength == "short":
-        G.TitleText2 = G.TitleText1
-    
-    return(G.TitleText2)   #  End of function: Title_Build
-
 def Static_Variables_Create():         
     # +++ CREATE PERSISTENT/STATIC VARIABLES.
     # https://docs.streamlit.io/library/api-reference/session-state
@@ -1132,17 +1119,6 @@ def Static_Variables_Create():
     S.PrevStart = 0.0       # Start of range of prevalences to plot.
     S.PrevEnd = 1.0         # End of range of prevalences to plot.
     S.PrevInt = 0.03        # Prevalence to be highlighted on plot.
-
-    S.LineShow_FPPercent = True
-    S.LineShow_FNPercent = True
-    S.LineShow_PPV = False
-    S.LineShow_NPV = False
-    S.LineShow_FP = False
-    S.LineShow_FN = False
-    S.LineShow_ACC = False
-    S.LineShow_PREVI = False
-    
-
     
     return() # End of function: Static_Variables_Create
 
@@ -1150,103 +1126,3 @@ def Static_Variables_Create():
 MainLine()   # Start this program.
 
 
-
-###############################    O L D  C O D E #############################
-
-# def False_Percentages_Set(): 
-#     # We have already calculated the False Positive Percentage 
-#     # at any prevalence in our datatable. (FPPercent = 1 - PPV).
-#     # Now we just have to pull out the FPPercent value at the users
-#     # Prevalence of Interest.
-#     # This code can be verified at http://araw.mede.uic.edu/cgi-bin/testcalc.pl
-#     G.False_Pos_Message = "" 
-#     Precedingx = 0
-#     Precedingy = 0
-#     for x,y in zip(G.DataTable[('Prevalence')],G.DataTable['FPPercent']):
-#         if x >= G.PrevInt:
-#             # Stop search. We are near the prevalence of interest.
-#             if x > G.PrevInt:     # We may not get an exact hit of PrevInt
-#                 x = Precedingx
-#                 y = Precedingy    
-#             else:                 
-#                 pass             # Continue loop looking for the PrevInt.
-#             # y now contains the false positive rate at x=PrevInt.  
-#             # y = FalsePositive% = 1 - PPV
-#             G.False_Pos_Message = str("{:.3f}".format(y * 100) + 
-#                 "% of all positives are false at a prevalence of " +
-#                 "{:.6f}".format(G.PrevInt ) + "."  )
-#             break  # Break the "for" loop.
-#         else:    
-#             Precedingx = x
-#             Precedingy = y
-#             # Continue 'for x,y in zip'
-    
-#     # Find the false negative percentage.
-#     G.False_Neg_Message = ""
-#     Precedingx = 0
-#     Precedingy = 0
-#     for x,y in zip(G.DataTable[('Prevalence')],G.DataTable['FNPercent']):
-#         if x >= G.PrevInt:
-#             # Stop search. We are near the prevalence of interest.
-#             if x > G.PrevInt:     # We may not get an exact hit of PrevInt
-#                 x = Precedingx
-#                 y = Precedingy    
-#             else:                 
-#                 pass             # Continue loop looking for the PrevInt.
-#             # y now contains the false negative rate at x=PrevInt.  
-#             # y = FalseNegativePercent  = 1 - NPV
-#             G.False_Neg_Message = str("{:.3f}".format(y * 100) + 
-#                 "% of all negatives are false at a prevalence of " +
-#                 "{:.6f}".format(G.PrevInt ) + "."  )
-#             break  # Break the "for" loop.
-#         else:    
-#             Precedingx = x
-#             Precedingy = y
-#             # Continue 'for x,y in zip'        
-#     return()  # End of function: False_Percentages_Set.
-
-
-
-# PLOT LINES METADATA.
-#   Our plot has mulitple lines (graphs) on the same axes.
-#   We use this dictionary to keep track of the metadatA of those lines.
-#   For example the user can choose to hide or show a particular line.
-# LineMetaData = {"PPV":
-#                 {"label": "PPV: Positive Predictive Value",
-#                     "visible": 1,
-#                     "color": "magenta"
-#                  },
-#                 "FPPercent":{"label":"FPPercent:False Positive Percentage",
-#                               "visible": 1,
-#                               "color": "red"
-#                             },
-#                 "NPV":  {"label": "NPV: Negative Predictive Value",
-#                          "visible": 1,
-#                          "color": "green"
-#                          },
-#                 "FNPercent":{"label":"FNPercent:False Negative Percentage",
-#                               "visible": 1,
-#                               "color": "red"
-#                             },
-#                 "FP":   {"label": "FP: False Positive (NPV)",
-#                          "visible": 1,
-#                          "color": "red"
-#                          },
-
-#                 "FN":    {"label": "FN: False Negative (NPV)",
-#                           "visible": 1,
-#                           "color": "yellow"
-#                           },
-#                 "FN%":  {"label": "FN% : False Positive Percentage",
-#                            "visible": 1,
-#                            "color": "red"
-#                            },
-#                 "ACC":    {"label": "ACC: General Accuracy",
-#                            "visible": 1,
-#                            "color": "blue"
-#                            },
-#                 "PrevInt":  {"label": "PrevInt: Prevalence Of Interest",
-#                            "visible": 1,
-#                            "color": "red"
-#                            },
-#                 }
