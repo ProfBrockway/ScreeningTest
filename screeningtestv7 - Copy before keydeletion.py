@@ -4,6 +4,9 @@ r"""
 # streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
 
 # TO DO
+        
+	- get rid of explicit declaration of static variables. let the key= do the creation ?	
+    
     -  Create documentation including a documentation vidio and deploy it
         - https://docs.python-guide.org/writing/documentation/
                    
@@ -16,8 +19,6 @@ r"""
 
 import os
 import streamlit as st
-
-
 from streamlit import session_state as S
 import pandas as pd
 import matplotlib as mpl    # We may use both matplotlib and plotly
@@ -34,7 +35,7 @@ class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
     # +++ DETAILS ABOUT THIS MODULE
     ThisModule_Project = "Medical Screening Tests Efficacy."
-    ThisModule_Version = "7_03   2022 March 9."  
+    ThisModule_Version = "7_01   2022 March 9."  
     ThisModule_About = "For a course Spring 2022. "  
     ThisModule_Author = "TB, UConn Math Dept."
     ThisModule_Purpose = ("To demonstrate the effect of disease prevalence " 
@@ -205,7 +206,9 @@ def MainLine():
         Initialization_Perform_First_Load_Only()
         S.Dialog_State  = 1  # Upgrade state so we don't come back here.
 
-    else:  # We are responding to a session reply from the user.       
+    else:  # We are responding to a session reply from the user.
+        S.Display_Count += 1  # Count of sessions.
+        
         # Initalize variables for every run.
         #   Remember nothing outside the Streamlit Static/persistant dictionary
         #   is preserved across sessions. So we perform the one time
@@ -232,25 +235,29 @@ def MainLine():
 def Initialization_Perform_EveryRun():
     # Initalize variables for every run.
     #   Remember nothing is preserved across sessions, except variables in  
-    #   the Streamlit static "session_state" dictionary. 
+    #   the streamlit static "session_state" dictionary.
     #  
-    #   On the first run we perform the "first load" program initialization.
-    #   On subsequent runs we perform the "every run" initialization to 
+    #   On the first run we perform the one time program initialization.
+    #   On subsequent runs we perform the "every run" Initialization to 
     #   initialize or reinitialize anything not preserved across 
-    #   the GUI dialog.
+    #   the display/response dialog.
     # 
     # Alternatives to repeating initialization here are: 
     # (1) Save static/persistant variables in the streamlit "session_state".
-    # (2) Make the initialization "static" declaring the variable 
-    #     expliticly and initialize them in the streamlit st.cache.
+    # (2) Make the initialization "static" using streamlit st.cache.
     #      - Use st.cache if the initialization is very time consuming.
     # (3) Initialize in our Global_Variables class (above)
     #     The Global_Variables class is run everytime the app is run.
     #     So it initializes every time streamlit reruns this app.
     #
-    # Turns out we don't need any explicit initializations.
-    # However having an "Every Run" initialization function in case
-    # it's needed is good practice.
+    # However having an "Every Time" initialization function is good practice.
+    # It may be neccessary to make the logic work.
+    # Also its less vulnerable to the subtle misbehaviors of alternatives
+    # (1) and (2).
+ 
+
+    
+ 
     return()
 
 def Initialization_Perform_First_Load_Only():
@@ -259,8 +266,7 @@ def Initialization_Perform_First_Load_Only():
     Initialization_Perform_EveryRun()
 
     # This must be the FIRST streamlit function in the program.
-    # This must be called only once. Be careful not to issue any Streamlit
-    # commands before this function executes.
+    # This must be called only once.
     GUI_HelpMenu_Build()
        
     # Static variables are static, persistant and global.  
@@ -463,17 +469,31 @@ def User_Input_Process():
                 "."                )     
         
         G.DataTable = G.DataTable.append(newrow, ignore_index=True)
+    
     # End of 'For each PrevCurrent'
+
     return # End of function: User_Input_Process
 
 def GUI_Build_Basic_Layout():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
     #   on the left and a plot and display area on the right.
+    #
+    #   !!
+    # - !!!!! DON"T ADD A "value=" parameter to any streamlit widget. !!!!!!
+    #      The "val=" causes error messages about duplicate initialization.
+    #       Instead let the static variable created by the key= parameter
+    #       do the work.
+    #
+    #  - Widget values are stored in "linked" streamlit persistent variables.
+    #     The value input/output to/from each widget is stored in/retrieved 
+    #     from a streamlit "linked" persistant variable linked to the 
+    #     widget's by the widgets "key=" parameter. See elsewhere in this
+    #     program for an explanation of "linked" static variables.
     
     # - We now make the sidebar a single form with a single submit button.
-    #   Because we are using the Streamlit a "form" and its form_submit_button,
-    #   this app only reruns when you hit the form submit button, NOT 
-    #   (as is default behavior) at each widget interaction.
+    #    With st.form and its form_submit_button, this app only reruns
+    #    when you hit the form submit button, NOT at each widget interaction.
+    #    https://blog.streamlit.io/introducing-submit-button-and-forms/
     Form1 = st.sidebar.form(key="Form1", clear_on_submit=False)
 
     with Form1:
@@ -481,7 +501,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Create a textbox for displaying instructions and error messages.
         st.text_area(
             key="MsgText",   # Value will be placed in S.MsgText'].
-            value=G.Msg01,
             label="INSTRUCTIONS",
             height=None,
             max_chars=None,
@@ -504,7 +523,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input the Population Size.
         st.number_input(
             key="PopSize",        # Value will be placed in S.MsgText'].
-            value=100,
             label="Population",
             min_value=1,
             max_value=1000,
@@ -522,7 +540,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input the Test Sensitivity.
         st.number_input(
             key="Sens",              # Value will be placed in S.Sens'].
-            value=0.99,
             label="Sensitivity",
             min_value=0.00,
             max_value=1.0,
@@ -535,7 +552,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input The Test Specificity.
         st.number_input(
             key="Spec",          # Value will be placed in S.Spec'].
-            value=0.99,
             label="Specificity",
             min_value=0.00,
             max_value=1.0,
@@ -548,7 +564,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input the start of the range of prevalences to be tested.
         st.number_input(
             key="PrevStart",  # Value will be placed in S.PrevStart'].
-            value=0.0,
             label="Prevalence Start",
             min_value=0.00,
             max_value=0.99,
@@ -562,7 +577,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input the end of the range of prevalences to be tested.
         st.number_input(
             key="PrevEnd",  # Value will be placed in S.PrevEnd'].
-            value=1.0,
             label="Prevalence End",
             min_value=0.00,
             max_value=1.00,
@@ -575,7 +589,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Input the prevalence of interest to be highlighted on the plot
         st.number_input(
             key="PrevInt",    # Value will be placed in S.PrevInt'].
-            value=0.03,
             label="Prevalence Of Interest",
             min_value=0.00,
             max_value=1.00,
@@ -1005,39 +1018,50 @@ def StMarkdown(TextToBeFormated="", color="black",
     return(md)  # End of function: StMarkdown
 
 def Static_Variables_Create():         
-    # +++ CREATE STATIC VARIABLES.
-    # Streamlit reloads the app everytime the user replys to the GUI.
-    # We therefore have to remember the state of the conversation and
-    # save any variables we need to preserve in the Streamlit 
-    # Streamlit static "session_state" dictionary. 
-    # STATIC VARIABLES:
-    #   - Static variables are static (preserved) between sessions.    
-    #   - Static variables are stored and created by streamlit in the Streamlit
-    #     Streamlit static "session_state" dictionary.
-    #   - Static variables are effectively global with the app.
-    #   - Static variables are created in two ways:
-    #       - Explicitly: 
-    #             - Declared using the Streamlit "session_state" method.
-    #             - Eg:  st.session_state['Display_Count'] = 0
-    #             - In our case the st.session_State is abbreviated to S.
-    #                    - Eg: S.Input_SSN = 0
-    #                    - from streamlit import session_state as S
-    #      - Implicitly Using The Streamlit Widget key= keyword.
-    #         - A Streamlit widget with a key=namex automatically
-    #           creates a static variable call namex in the Static
-    #           'session state dictionary'.
-    #       - Any change in the linked widget will automatically update 
-    #          the linked static variable.
-    #       - Any change in the static variable will automatically 
-    #         update the linked widget.
-    #      - The python 'type' of linked static variables are specifed by the
-    #        linked widget's "format=" parameter.
+    # +++ CREATE PERSISTENT/STATIC VARIABLES.
+    # https://docs.streamlit.io/library/api-reference/session-state
+    # During the first load session, we create our "Persistent" variables.
+    #  Persistent variables:
+    #   - Are stored and created by streamlit in the streamlit
+    #     'session state dictionary'
+    #   - Are static (preserved) between sessions.
+    #   - Are effectively global.
+    #   - Have a python dictionary like syntax.
+    #   - Are created using the streamlit "session_state" method.
+    #       - Eg:  st.session_state['Display_Count'] = 0
+    #       - In our case the st.session_State is abbreviated to Static.
+    #          - from streamlit import session_state as Static
+    #          - Eg: S.Input_SSN'] = 0
+    #   - Can be "linked" to a streamlit widget via the widget key= parameter.
+    #      - Using the key= parameter on any widget automatically
+    #        creates a static variable in the 'session state dictionary'.
+    #        But I prefer to declare them explicity as well.
+    #      - Any change in the Static linked widget will automatically update 
+    #      - the linked persistant variable.
+    #      - Any change in linked persistant variable will automatically 
+    #        update the linked widgets value in th Static.
+    #      - The python type of linked variables are specifed by the
+    #        linked widget's  "format=" parameter.
+    #
     #      - Eg of a Linked persistent variable.
-    #            st.number_input(label=:Enter Age", key="Age")
- 
+    #         In this initialization section:
+    #              S.FirstName'] = "Fred" # Create a persistant variable.
+    #         In the Static creation code:
+    #             st.number_input(label=:Enter first name", key="FirstName")
+    #         Notice the key is the same as the persistent variable name.
 
     S.Dialog_State = 0    # Create session Dialog_State variable.
+    S.Display_Count = 1   # A Count of sessions.
 
+    # Persistant variables for the users input in the GUI
+       
+    S.MsgText = G.Msg01     # A text box for instructions & errors.
+    S.PopSize = 100         # Test population.
+    S.Sens = 0.99           # Test sensitivity.
+    S.Spec = 0.99           # Test specifcity.
+    S.PrevStart = 0.0       # Start of range of prevalences to plot.
+    S.PrevEnd = 1.0         # End of range of prevalences to plot.
+    S.PrevInt = 0.03        # Prevalence to be highlighted on plot.
     
     return() # End of function: Static_Variables_Create
 
