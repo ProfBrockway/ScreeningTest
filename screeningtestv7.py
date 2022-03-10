@@ -251,6 +251,7 @@ def Initialization_Perform_EveryRun():
     # Turns out we don't need any explicit initializations.
     # However having an "Every Run" initialization function in case
     # it's needed is good practice.
+
     return()
 
 def Initialization_Perform_First_Load_Only():
@@ -266,6 +267,7 @@ def Initialization_Perform_First_Load_Only():
     # Static variables are static, persistant and global.  
     Static_Variables_Create() 
        
+    S.MsgText = G.Msg01
     return()  # End of function: Initialization_Perform_First_Load_Only
 
 def User_Input_Validate_And_Internalize():
@@ -286,7 +288,7 @@ def User_Input_Validate_And_Internalize():
     #      - So most of the following validations are duplicative.
     #        But I have left them in as belt and suspenders.
     
-    S.MsgText = ""   
+    S.MsgText = ""   # Clear the "error" message text.
 
     G.PopSize, InputOK = Validate_Integer(S.PopSize)
     if InputOK == False:
@@ -336,8 +338,8 @@ def User_Input_Validate_And_Internalize():
         Msg_Set("Error 1026: Prevalence Of Interest Must be [0,1]")
         return(False)
     if (G.PrevInt < G.PrevStart) or (G.PrevInt > G.PrevEnd):
-       Msg_Set("Error 1030: Prevalence Of Interest "\
-                "must lie between Prevalence Start and Prevalence End.")
+       Msg_Set("Error 1030: Prevalence Of Interest must lie between "  
+               "Prevalence Start and Prevalence End.")
        return(False)
  
     # If we fall through here the users input is all valid.
@@ -481,7 +483,6 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Create a textbox for displaying instructions and error messages.
         st.text_area(
             key="MsgText",   # Value will be placed in S.MsgText'].
-            value=G.Msg01,
             label="INSTRUCTIONS",
             height=None,
             max_chars=None,
@@ -584,7 +585,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             help=("""Enter the prevalence of interest.   
                   A vertical line will highlight
                   the values at the requested prevalence.    
-                  A decimal percentage  [ 0.0,  1 ]"""),
+                  A decimal percentage  [ 0,  1 ]"""),
             on_change=None)
  
         # End of "With Form"
@@ -639,7 +640,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     with col2: 
         # Display a pop up help message to help accessing documentation.
         # We use an st.button and load its help parameter with our popup.
-        # This works fine when the user hovers the mouse over the button.   
+        # This trick works fine when the user hovers the mouse over the button.   
         # But when the user clicks the button (as is reasonable) the
         # app is rerun. This doesn't produce any errors but is obviously
         # inefficient. We have to live with this until we find a better
@@ -667,12 +668,16 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     # - That file is downloaded to the browsers download location.
     # - There is no "save as" menu. The file name is hard coded.
     DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
-    helpstr = f"""You can save the data frame to your computer using this button.  \r
+    helpstr = f"""You can save the data frame to your computer using 
+        this button.  \r
         The file will be called {G.Link40}.   \r
         The file will be in CSV format, (Comma Separated Variable).   \r
-        The file will be saved in your browser's default download location on your computer.  \r
-        You can enlarge the table by clicking the 'View fullscreen' icon located at the top right of the table.  \r
-        'Float' the mouse over the table and the 'View fullScreen' icon will appear.
+        The file will be saved in your browser's default download location
+        on your computer.  \r
+        You can enlarge the table by clicking the 'View fullscreen' icon
+        located at the top right of the table.  \r
+        'Float' the mouse over the table and the 'View fullScreen'
+        icon will appear.
          """
     st.download_button(label="⚙️ Download The DataFrame", 
                        data=DataFrame_CSV, 
@@ -968,8 +973,8 @@ def Msg_Set(TextString):
     FormattedText = TextString
     ErrStr = TextString[0:5].upper()  
     if ErrStr == "ERROR":
-       FormattedText = (f"❌  There is an error in your input {FormattedText}"
-                        "\nPlease correct and try again.")
+       FormattedText = ("❌  There is an error in your input. "
+                       f"{FormattedText}  Please correct and try again.")
     S.MsgText = FormattedText
     G.Msg_Current = FormattedText
     return()
