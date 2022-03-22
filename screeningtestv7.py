@@ -1,32 +1,46 @@
+###############################################################################
+#                            ScreeningTest
+###############################################################################
+#
+# Course: CCSU Stat 476.  Spring 2022.
+# Author: Tim Brockway. Student ID: 30259316   Email: BrockwayTim@My.CCSU.edu
+# Professor: Roger L. Bilisoly
+#     bilisolyr@ccsu.edu  https://www2.ccsu.edu/faculty/bilisolyr
+# Program: screeningtest.py
+# Purpose: To demonstrate the effect of disease prevalence on the
+#          reliability of medical screening tests.
+#
+# How to run this program:
+#   - Copy & paste the following link into a webbrowser and enter.
+# https://share.streamlit.io/profbrockway/screeningtest/main/screeningtestv7.py
+#   - The web page will explain how to run the program and its plots.
+#
+###############################################################################
 
-r"""
-# To run the web browser and see our web page enter the following command.
+#  Testing on development computer 
+#  - To test the app on a local (undeployed_) server and see our web page
+#  -  enter the following command.
 # streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
 
 # TO DO
-    -  Create documentation including a documentation vidio and deploy it
-        - https://docs.python-guide.org/writing/documentation/
+# 	-  Create documentation including a documentation vidio and deploy it
+#     - https://docs.python-guide.org/writing/documentation/
                    
-    # For final submission.
-    #  - spell check comments to get rid of gross errors.
-    # - check results carefully.
-    # - create an actual test case of a specific covid screening test.
-"""
-
+# For final submission.
+#  -spell check comments to get rid of gross errors.
+# - check results carefully against another calculator.
+# - create an actual test case of a specific covid screening test.
+###############################################################################
 
 import os
 import streamlit as st
-
-
 from streamlit import session_state as S
 import pandas as pd
-import matplotlib as mpl    # We may use both matplotlib and plotly
 
-# Plotly imports. Some may be flagged as unused, but import them anyway.
-import scipy # Used by plotly figure factory behind the scenes.
+# Sundry imports. Some may be flagged as unused, but import them anyway.
+import matplotlib as mpl    # We may use both matplotlib and plotly
 import plotly
 import plotly.express as px 
-import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
 
@@ -187,31 +201,29 @@ class Global_Variables():  # A class creating all global variables.
     Plot_Report_Long = None
     False_Pos_Message = None
     False_Neg_Message = None    
-
- 
-    
 # End of Global Variables
 G = Global_Variables()    # Instantiate our global variables.
 
 def MainLine():
-    # Remember this app is run every time the GUI is displayed and 
-    # the "form run button" is clicked by the user.
+    # Remember this app is rerun by Streamlit every time the GUI is 
+    # displayed and he "form run button" is clicked by the user.
     # So we have to keep track of the conversation state.
-        
+    #  - We preserve cnverstation state and other "static" values across 
+    #    reinvocations in the Streamlit "Static" dictionary.
+    #  - We perform a "one time"  program initialization when the code is
+    #    first loaded. 
+    #  - On every reinvocation we perform "every time" initialization.
+    
+    
     ConsoleClear()  # Clear the internal IPyhon console.
 
-    # If this the initial session create "Static/Persistent" variables.
+    # If this the initial session then create "Static/Persistent" variables.
     if 'Dialog_State' not in S:
-        Initialization_Perform_First_Load_Only()
+        Initialization_Perform_First_Load_Only() # Create Dialog_State etc.
         S.Dialog_State  = 1  # Upgrade state so we don't come back here.
 
     else:  # We are responding to a session reply from the user.       
-        # Initalize variables for every run.
-        #   Remember nothing outside the Streamlit Static/persistant dictionary
-        #   is preserved across sessions. So we perform the one time
-        #   program initialization once then perform the "every run"
-        #   Initialization.
-        Initialization_Perform_EveryRun()
+        Initialization_Perform_EveryRun()  # Do "every run" initialization.
         
         # Validate and internalize users'input.
         InputOK = User_Input_Validate_And_Internalize()
@@ -231,37 +243,29 @@ def MainLine():
 
 def Initialization_Perform_EveryRun():
     # Initalize variables for every run.
-    #   Remember nothing is preserved across sessions, except variables in  
-    #   the Streamlit static "session_state" dictionary. 
-    #  
-    #   On the first run we perform the "first load" program initialization.
-    #   On subsequent runs we perform the "every run" initialization to 
-    #   initialize or reinitialize anything not preserved across 
-    #   the GUI dialog.
     # 
     # Alternatives to repeating initialization here are: 
     # (1) Save static/persistant variables in the streamlit "session_state".
-    # (2) Make the initialization "static" declaring the variable 
-    #     expliticly and initialize them in the streamlit st.cache.
-    #      - Use st.cache if the initialization is very time consuming.
-    # (3) Initialize in our Global_Variables class (above)
+    # (2) Initialize in our Global_Variables class (above)
     #     The Global_Variables class is run everytime the app is run.
     #     So it initializes every time streamlit reruns this app.
     #
     # Turns out we don't need any explicit initializations.
+    #    It's all done in our global variables class G.
     # However having an "Every Run" initialization function in case
     # it's needed is good practice.
-
     return()
 
 def Initialization_Perform_First_Load_Only():
 
-    # Initalize variables etc.
+    # Initalize rerun variables etc.
     Initialization_Perform_EveryRun()
 
-    # This must be the FIRST streamlit function in the program.
-    # This must be called only once. Be careful not to issue any Streamlit
-    # commands before this function executes.
+    # Build the webpage Help menu. 
+    # This function contains a Streamlit st.set_page_config statement.
+    #  -This must be the FIRST streamlit function executed in the program.
+    #  - This must be called only once. Be careful not to issue any Streamlit
+    #    commands before this function executes.
     GUI_HelpMenu_Build()
        
     # Static variables are static, persistant and global.  
@@ -447,7 +451,7 @@ def User_Input_Process():
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FPPercent = G.FPPercent # Save the FP percentage.
             G.False_Pos_Message = (
-                "About " + 
+                " - About " + 
                 str( "{:.2f}".format(G.FPPercent * 1)) + 
                 " of all positives are false at a prevalence of " +
                 "{:.6f}".format(G.PrevInt) + 
@@ -458,7 +462,7 @@ def User_Input_Process():
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FNPercent = G.FNPercent  # Save the FN percentage.
             G.False_Neg_Message =(
-                "About " + 
+                " - About " + 
                 str( "{:.2f}".format(G.FNPercent * 1)) + 
                 " of all negatives are false at a prevalence of " +
                 "{:.6f}".format(G.PrevInt) + 
@@ -504,7 +508,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
         # Create input boxes in the toolbar for our user specifed variables.
         # Input the Population Size.
         st.number_input(
-            key="PopSize",        # Value will be placed in S.MsgText'].
+            key="PopSize",        # Value will be placed in S.Popsize'].
             value=100,
             label="Population",
             min_value=1,
@@ -529,7 +533,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             max_value=1.0,
             step=0.01,
             format="%.4f", 
-            help="""Enter the tests' Sensitivity.    \r
+            help="""Enter the test's Sensitivity.    \r
                    A decimal percentage [ 0, 1]""",
             on_change=None)
 
@@ -542,7 +546,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             max_value=1.0,
             step=0.01,
             format="%.4f",
-            help="""Enter the tests' Specificity.  
+            help="""Enter the test's Specificity.  
             A decimal percentage [ 0, 1 ]""",
             on_change=None)
 
@@ -590,7 +594,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
  
         # End of "With Form"
     
-    st.info("🟢 MEDICAL SCREENING TEST CALCULATOR")   
+ 
     return()  # End of function: GUI_Build_Basic_Layout
 
 def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
@@ -603,7 +607,8 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     # Build the plot using Plotly graph objects (GO)(not plotly express).
     Plot_Build_Plotly_GO()    
     
-    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED")
+    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED.   \r"
+            "   Click the legend to display or hide the various variables.")
     
     # Display a Plot Report box on the GUI.
     st.text(Plot_Report_Build(formatfor="regular")) 
@@ -631,32 +636,21 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #   I have not been able to fix this problem so for now, the pdf
     #   is displayed and the user advised to download it a use a 
     #   proper pdf viewer.
-    st.info("🟢 THIS APP'S DOCUMENTATION.")
-       
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write(" [ Link To This App's Documentation.]"  "(%s)" % G.Link01)
-        st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
-    with col2: 
-        # Display a pop up help message to help accessing documentation.
-        # We use an st.button and load its help parameter with our popup.
-        # This trick works fine when the user hovers the mouse over the button.   
-        # But when the user clicks the button (as is reasonable) the
-        # app is rerun. This doesn't produce any errors but is obviously
-        # inefficient. We have to live with this until we find a better
-        # method for pop up messages.
-        tempstr = (""" You can read this app's documentation in the project's
-        Gihub project 'repository'.   
-        Click the links.           
-        Github only provides primitive document viewers.
-        So you may wish to download the files and view them on your computer.
-        Then you will be able to navigate the documents using indexes, 
-        navigation panes, search  etc.   
-        You can also see the program documentation by using
-        the menu in the top right of this webpage '≡' (3 horizontal lines) then
-        select 'GET HELP'. """) 
-        st.button(label="Help", key="ButtonH1", help=tempstr )
+    tempstr = ("You can read this app's documentation in the project's "
+     "Gihub project 'repository'.   \n" 
+     "Just click the links below or look in the 'Help' menu. "   
+     "Look for '≡' (3 horizontal lines) then select 'Get Help'.  \r"
+     "Github only provides primitive document viewers for pdf documents.   \r"
+     "So you may wish to download and view documentation on your computer.  \r"
+     "Then you will be able to navigate the documents using indexes, "
+     "navigation panes, search  etc." ) 
+     
+    with st.expander("🟢 THIS APP'S DOCUMENTATION."):
+         st.caption(tempstr) 
+         st.write(" [ Link To This App's Documentation.]"  "(%s)" % G.Link01)
+         st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
 
+ 
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
@@ -897,19 +891,19 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
 
 def Plot_Report_Build(TitleLength = "long",formatfor="regular"):
     G.Plot_Report_Short = str(
-                   "\n\nScreening Test Statistics \n" +
-                   "As The Disease Population Prevalence Varies From " +
+                   "\n\nReport On Your Screening Test Statistics. \n" +
+                   " - The Disease Population Prevalence Varies From " +
                    "{:.5f}".format(G.PrevStart)  +
                    " To {:.5f}".format(G.PrevEnd) + "."
                            )
    
     G.Plot_Report_Long =  G.Plot_Report_Short + "  \n" + str(
-      "Population = {:,}   \n".format(G.PopSize) +
-      "Sensitivity = {:.4f}   \n".format(G.Sens) +
-      "Specificity = {:.4f}   \n".format(G.Spec) +
-      "Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
-      "Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
-      "Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
+      " - Population = {:,}   \n".format(G.PopSize) +
+      " - Sensitivity = {:.4f}   \n".format(G.Sens) +
+      " - Specificity = {:.4f}   \n".format(G.Spec) +
+      " - Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
+      " - Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
+      " - Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
       G.False_Pos_Message + "  \n" +
       G.False_Neg_Message
                                                 ) 
@@ -1012,38 +1006,33 @@ def StMarkdown(TextToBeFormated="", color="black",
 def Static_Variables_Create():         
     # +++ CREATE STATIC VARIABLES.
     # Streamlit reloads the app everytime the user replys to the GUI.
-    # We therefore have to remember the state of the conversation and
-    # save any variables we need to preserve in the Streamlit 
-    # Streamlit static "session_state" dictionary. 
+    # We therefore have to store any variables needed across invocations
+    # in the Streamlit "Static" Storage.
+    #
     # STATIC VARIABLES:
     #   - Static variables are static (preserved) between sessions.    
-    #   - Static variables are stored and created by streamlit in the Streamlit
-    #     Streamlit static "session_state" dictionary.
-    #   - Static variables are effectively global with the app.
+    #   - Static variables are stored and created by Streamlit in the Streamlit
+    #     "session_state" dictionary.
+    #   - Static variables are effectively global within the app.
     #   - Static variables are created in two ways:
-    #       - Explicitly: 
-    #             - Declared using the Streamlit "session_state" method.
-    #             - Eg:  st.session_state['Display_Count'] = 0
-    #             - In our case the st.session_State is abbreviated to S.
-    #                    - Eg: S.Input_SSN = 0
-    #                    - from streamlit import session_state as S
-    #      - Implicitly Using The Streamlit Widget key= keyword.
+    #       (1) Explicitly: 
+    #         - Declared using the Streamlit "session_state" method.
+    #           - Eg:  st.session_state['Display_Count'] = 0
+    #         - In our case the st.session_State is abbreviated to S.
+    #            - Eg: S.Input_SSN = 0 (import session_state as S).
+    #      (2) Implicitly Using The Streamlit Widget key= keyword.
     #         - A Streamlit widget with a key=namex automatically
-    #           creates a static variable call namex in the Static
-    #           'session state dictionary'.
-    #       - Any change in the linked widget will automatically update 
-    #          the linked static variable.
-    #       - Any change in the static variable will automatically 
-    #         update the linked widget.
+    #           creates a static variable called namex in the Streamlit Static
+    #           dictionaryy.
+    #            - Any change in the linked widget in th GUI  will
+    #              automatically update the linked static variable.
+    #            - Any change in the static variable will automatically 
+    #              update the linked widget in the GUI
     #      - The python 'type' of linked static variables are specifed by the
     #        linked widget's "format=" parameter.
     #      - Eg of a Linked persistent variable.
     #            st.number_input(label=:Enter Age", key="Age")
- 
-
     S.Dialog_State = 0    # Create session Dialog_State variable.
-
-    
     return() # End of function: Static_Variables_Create
 
 

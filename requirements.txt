@@ -6,3 +6,5 @@ Pillow==9.0.1
 plotly
 scipy
 openpyxl
+streamlit-aggrid==0.2.3-2
+simplejson
