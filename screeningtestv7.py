@@ -61,7 +61,7 @@ class Global_Variables():  # A class creating all global variables.
   
     
     # +++ RESOURCE LINKS Etc  Pictures/Videos/Files etc stored online.
-    #   Where possible we base our resources in this apps repostitory
+    #   Where possible we base our resources in this program's repostitory
     #   at github. If github basing is not possible or inadequate
     #   we have to use another cloud storage site, eg Google drive.
          
@@ -205,7 +205,7 @@ class Global_Variables():  # A class creating all global variables.
 G = Global_Variables()    # Instantiate our global variables.
 
 def MainLine():
-    # Remember this app is rerun by Streamlit every time the GUI is 
+    # Remember this program is rerun by Streamlit every time the GUI is 
     # displayed and he "form run button" is clicked by the user.
     # So we have to keep track of the conversation state.
     #  - We preserve cnverstation state and other "static" values across 
@@ -248,7 +248,7 @@ def Initialization_Perform_EveryRun():
     # (1) Save static/persistant variables in the streamlit "session_state".
     # (2) Initialize in our Global_Variables class (above)
     #     The Global_Variables class is run everytime the app is run.
-    #     So it initializes every time streamlit reruns this app.
+    #     So it initializes every time streamlit reruns this program.
     #
     # Turns out we don't need any explicit initializations.
     #    It's all done in our global variables class G.
@@ -425,7 +425,7 @@ def User_Input_Process():
         # FPPercent. The percentage of all negatives that are false.
         G.FNPercent =  1 - G.NPV
             
-        # ACC: Accuracy: = ((TP + TN)) / Pop
+        # ACC: The 'General' Accuracy: = ((TP + TN)) / Pop
         G.Acc = (G.TP + G.TN) / G.PopSize
         
         # Add the stats for the Population Prevalence we have just processed
@@ -478,7 +478,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
     
     # - We now make the sidebar a single form with a single submit button.
     #   Because we are using the Streamlit a "form" and its form_submit_button,
-    #   this app only reruns when you hit the form submit button, NOT 
+    #   this program only reruns when you hit the form submit button, NOT 
     #   (as is default behavior) at each widget interaction.
     Form1 = st.sidebar.form(key="Form1", clear_on_submit=False)
 
@@ -628,7 +628,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
 
     
     ###########################################################################
-    # +++ MAKE THIS APPS DOCUMENTATION AVAILABLE.
+    # +++ MAKE THIS PROGRAM'S DOCUMENTATION AVAILABLE.
     #   We  base the pdf file in the github repository for the project.
     #   The github using the github link to the address displays
     #   the pdf file in the primitive github pdf view which does not
@@ -636,7 +636,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #   I have not been able to fix this problem so for now, the pdf
     #   is displayed and the user advised to download it a use a 
     #   proper pdf viewer.
-    tempstr = ("You can read this app's documentation in the project's "
+    tempstr = ("You can read this programs's documentation in the project's "
      "Gihub project 'repository'.   \n" 
      "Just click the links below or look in the 'Help' menu. "   
      "Look for '≡' (3 horizontal lines) then select 'Get Help'.  \r"
@@ -645,10 +645,10 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      "Then you will be able to navigate the documents using indexes, "
      "navigation panes, search  etc." ) 
      
-    with st.expander("🟢 THIS APP'S DOCUMENTATION."):
-         st.caption(tempstr) 
-         st.write(" [ Link To This App's Documentation.]"  "(%s)" % G.Link01)
-         st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
+    with st.expander("🟢 THIS PROGRAM'S DOCUMENTATION."):
+      st.caption(tempstr) 
+      st.write(" [ Link To This programs's Documentation.]"  "(%s)" % G.Link01)
+      st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
 
  
     
@@ -685,11 +685,11 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                        disabled=False)
 
     ###########################################################################
-    # +++ SHOW A VIDEO DEMONSTRATING THIS APP.
+    # +++ SHOW A VIDEO DEMONSTRATING THIS PROGRAM.
     #  Github basing of videos does not allow raw address of large files.
     #  Google basing of videos  does not work because it downloads too slowly.
     #  So until I can figure out how to base videos at github we use Youtube.
-    st.info("🟢  A VIDEO DEMONSTRATING THIS APP'S FEATURES.")   
+    st.info("🟢  A VIDEO DEMONSTRATING THIS PROGRAM'S FEATURES.")   
     st.video(G.Link20)
    
     return  # End of function: GUI_Right_Panel_Build
@@ -918,19 +918,17 @@ def Plot_Report_Build(TitleLength = "long",formatfor="regular"):
 
 def Plot_Streamlit_FullScreenIcon_Format():
     # This function increases the visibility of the Streamlit
-    # full page icon..
-    style_fullscreen_button_css = """
+    # full page icon. It injects css code using markdown.
+    css = """
          button[title="View fullscreen"] 
          {background-color: #004170cc; left: 2; color: white; }
     
          button[title="View fullscreen"]:hover 
          {background-color: #004170; color: white; } """
     
-    st.markdown( "<style>" 
-                + style_fullscreen_button_css
-                + "</styles>",
-                unsafe_allow_html=True,
-               )
+    st.markdown( "<style>" + css + "</styles>", unsafe_allow_html=True)
+    return() # End of function: Plot_Streamlit_FullScreenIcon_Format
+    
 
 def PlotNowButton_Click_Event():
     # Not used.
