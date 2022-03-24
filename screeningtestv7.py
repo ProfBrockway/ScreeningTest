@@ -11,15 +11,16 @@
 #          reliability of medical screening tests.
 #
 # How to run this program:
-#   - Copy & paste the following link into a webbrowser and enter.
+# - Enter the following link into a web browser.
+# - The web page will then explain how to run the program and its plots.
 # https://share.streamlit.io/profbrockway/screeningtest/main/screeningtestv7.py
-#   - The web page will explain how to run the program and its plots.
+#
 #
 ###############################################################################
 
-#  Testing on development computer 
+#  Testing this program on a development computer. 
 #  - To test the app on a local (undeployed_) server and see our web page
-#  -  enter the following command.
+#  - locally enter the following command in the Anaconda console.
 # streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
 
 # TO DO
@@ -532,7 +533,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.0,
             step=0.01,
-            format="%.4f", 
+            format="%.7f", 
             help="""Enter the test's Sensitivity.    \r
                    A decimal percentage [ 0, 1]""",
             on_change=None)
@@ -545,7 +546,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.0,
             step=0.01,
-            format="%.4f",
+            format="%.7f",
             help="""Enter the test's Specificity.  
             A decimal percentage [ 0, 1 ]""",
             on_change=None)
@@ -585,7 +586,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             min_value=0.00,
             max_value=1.00,
             step=0.01,
-            format="%.4f",
+            format="%.7f",
             help=("""Enter the prevalence of interest.   
                   A vertical line will highlight
                   the values at the requested prevalence.    
@@ -647,8 +648,8 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      
     with st.expander("🟢 THIS PROGRAM'S DOCUMENTATION."):
       st.caption(tempstr) 
-      st.write(" [ Link To This programs's Documentation.]"  "(%s)" % G.Link01)
-      st.write(" [ Link To All Of The Projects Files.]"  "(%s)" % G.Link02)
+      st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
+      st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")
 
  
     
