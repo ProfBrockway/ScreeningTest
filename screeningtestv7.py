@@ -72,7 +72,7 @@ class Global_Variables():  # A class creating all global variables.
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
-    Link04 = "https://www.ibm.com/us-en?ar=1"  
+    Link04 = "https://github.com/ProfBrockway/ScreeningTest/issues"  
     # App documentation video.
     Link20 = "https://youtu.be/DkpuAnnDjyo"
     # Name of downloaded table file
@@ -169,6 +169,10 @@ class Global_Variables():  # A class creating all global variables.
     PrevEnd = None         # PrevEnd is input by the user.
     PrevInt = None         # PrevInt is input by the user.
 
+    # The report title input by the user.
+    UsersReportTitle = None
+    
+    
     # THE DATATABLE
     # The DataTable is a pandas dataframe (data table) to store our results.
     # - This program tests a range of values for prevalences [0 , 1]
@@ -347,6 +351,9 @@ def User_Input_Validate_And_Internalize():
                "Prevalence Start and Prevalence End.")
        return(False)
  
+    # Internalize the users report title.
+    G.UsersReportTitle = S.UserReportTitle
+    
     # If we fall through here the users input is all valid.
     S.MsgText = G.Msg01    # Reset the "Please enter test specs" message.
     return(True)  # End of function: User_Input_Validate_And_Internalize
@@ -593,6 +600,14 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
                   A decimal percentage  [ 0,  1 ]"""),
             on_change=None)
  
+        # Create a textbox user to input the report title.
+        st.text_area(
+            key="UserReportTitle",   # Value will be placed in S.MsgText'].
+            label="Title For Report",
+            height=None,
+            max_chars=None,
+            help="""Enter a title for the report on your screening test.""",
+            on_change=None)
         # End of "With Form"
     
  
@@ -608,7 +623,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     # Build the plot using Plotly graph objects (GO)(not plotly express).
     Plot_Build_Plotly_GO()    
     
-    st.info("🟢 HERE IS THE PLOT YOUR REQUESTED.   \r"
+    st.info("🟢 HERE IS THE SCREENING TEST PLOT YOUR REQUESTED.   \r"
             "   Click the legend to display or hide the various variables.")
     
     # Display a Plot Report box on the GUI.
@@ -890,30 +905,30 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
         
     return() # End of function:   Plot_Build_Plotly_GO()
 
-def Plot_Report_Build(TitleLength = "long",formatfor="regular"):
-    G.Plot_Report_Short = str(
-                   "\n\nReport On Your Screening Test Statistics. \n" +
-                   " - The Disease Population Prevalence Varies From " +
-                   "{:.5f}".format(G.PrevStart)  +
-                   " To {:.5f}".format(G.PrevEnd) + "."
-                           )
-   
-    G.Plot_Report_Long =  G.Plot_Report_Short + "  \n" + str(
-      " - Population = {:,}   \n".format(G.PopSize) +
-      " - Sensitivity = {:.4f}   \n".format(G.Sens) +
-      " - Specificity = {:.4f}   \n".format(G.Spec) +
-      " - Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
-      " - Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
+def Plot_Report_Build(formatfor="regular"):
+    if G.UsersReportTitle == None \
+       or G.UsersReportTitle == ""  \
+       or G.UsersReportTitle.isspace() :
+       G.UsersReportTitle = "Here is the report on your screening test." 
+       
+    G.Plot_Report_Long = str(
+       G.UsersReportTitle +  "  \n" +
+       " - The Disease Population Prevalence Varies From " +
+       "{:.5f}".format(G.PrevStart)  +
+       " To {:.5f}".format(G.PrevEnd) + ".   \n"
+       " - Population = {:,}   \n".format(G.PopSize) +
+       " - Sensitivity = {:.4f}   \n".format(G.Sens) +
+       " - Specificity = {:.4f}   \n".format(G.Spec) +
+       " - Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
+        " - Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
       " - Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
-      G.False_Pos_Message + "  \n" +
-      G.False_Neg_Message
-                                                ) 
+       G.False_Pos_Message + "  \n" +
+       G.False_Neg_Message    ) 
     
     # If the text is intended for an html text target use the html line break.
     if formatfor == "streamlit":
         G.Plot_Report_Long = G.Plot_Report_Long.replace("\n", "<br>")
-    if TitleLength == "short":
-        G.Plot_Report_Long = G.Plot_Report_Short
+
     
     return(G.Plot_Report_Long)   #  End of function: Plot_Report_Build
 
