@@ -7,6 +7,5 @@ plotly
 scipy
 openpyxl
 pyxlsb
-io
 streamlit-aggrid==0.2.3-2
 simplejson
