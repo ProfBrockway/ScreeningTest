@@ -10,7 +10,7 @@
 # Program: screeningtest.py
 # Purpose: To demonstrate the effect of disease prevalence on the
 #          reliability of medical screening tests.
-#
+#	 
 # How to run this program:
 # - Enter the following link into a web browser.
 # - The web page will then explain how to run the program and its plots.
@@ -27,7 +27,7 @@
 # TO DO
 # 	-  Create documentation including a documentation vidio and deploy it
 #     - https://docs.python-guide.org/writing/documentation/
-                   
+#   	🎬⚙️👇📽️ :books: 1F9A1	🦡 📥 ⚙  ⚠ ⛔ 🚫 ❔      ❕ ✅ ❌   '\u25b2'  u"\U0001F9A1"   \Uf0ed  \U0001F4DA \U0001F4EC  
 # For final submission.
 #  -spell check comments to get rid of gross errors.
 # - check results carefully against another calculator.
@@ -70,8 +70,8 @@ class Global_Variables():  # A class creating all global variables.
     #   we have to use another cloud storage site, eg Google drive.
          
     # Program Help/Documentation.    
-    Link01 = ("https://github.com/ProfBrockway/ScreeningTest/" 
-             "blob/main/Resource_App_Documentation_Full.pdf")
+    Link01 = ("https://github.com/ProfBrockway/ScreeningTest/blob/" 
+              "main/Documentation_screeningtest.py.pdf")
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
@@ -206,7 +206,7 @@ class Global_Variables():  # A class creating all global variables.
     Msg01 =  "Enter the parameters of the medical screening test "\
              "and click 'Plot Now' button."
     Plot_Report_Short = None
-    Plot_Report_Long = None
+    Plot_Report = None
     False_Pos_Message = None
     False_Neg_Message = None    
 # End of Global Variables
@@ -355,7 +355,7 @@ def User_Input_Validate_And_Internalize():
        return(False)
  
     # Internalize the users report title.
-    G.UsersReportTitle = S.UserReportTitle
+    G.UsersReportTitle =  S.UserReportAnnotation 
     
     # If we fall through here the users input is all valid.
     S.MsgText = G.Msg01    # Reset the "Please enter test specs" message.
@@ -462,7 +462,7 @@ def User_Input_Process():
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FPPercent = G.FPPercent # Save the FP percentage.
             G.False_Pos_Message = (
-                " - About " + 
+                "About " + 
                 str( "{:.2f}".format(G.FPPercent * 1)) + 
                 " of all positives are false at a prevalence of " +
                 "{:.6f}".format(G.PrevInt) + 
@@ -473,7 +473,7 @@ def User_Input_Process():
             # Stop search. We are near the prevalence of interest.
             G.PrevInt_FNPercent = G.FNPercent  # Save the FN percentage.
             G.False_Neg_Message =(
-                " - About " + 
+                "About " + 
                 str( "{:.2f}".format(G.FNPercent * 1)) + 
                 " of all negatives are false at a prevalence of " +
                 "{:.6f}".format(G.PrevInt) + 
@@ -605,8 +605,8 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
  
         # Create a textbox user to input the report title.
         st.text_area(
-            key="UserReportTitle",   # Value will be placed in S.MsgText'].
-            label="Title For Report",
+            key="UserReportAnnotation",   # Value will be placed in S.MsgText'].
+            label="Report Annotation",
             height=None,
             max_chars=None,
             help="""Enter a title for the report on your screening test.""",
@@ -620,18 +620,19 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     ###########################################################################
     # +++ BUILD THE PLOT REQUESTED BY THE USER AND PLACE IT ON THE GUI.
+    
     # Increase the visibility of the Streamlit "full page" icon.
     Plot_Streamlit_FullScreenIcon_Format()
      
     # Build the plot using Plotly graph objects (GO)(not plotly express).
     Plot_Build_Plotly_GO()    
     
-    st.info("🟢 HERE IS THE SCREENING TEST PLOT YOUR REQUESTED.   \r"
+    st.info("👍  HERE IS THE SCREENING TEST PLOT YOUR REQUESTED.   \r"
             "   Click the legend to display or hide the various variables.")
     
     # Display a Plot Report box on the GUI.
-    st.text(Plot_Report_Build(formatfor="regular")) 
-        
+    st.info(Plot_Report_Build(formatfor="streamlit"))  
+    
     # Place the Plotly plot on the GUI.
     #  use_container_width
     #      If True, set the chart width to the column width. 
@@ -661,7 +662,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      
     StylerA = G.DataTable.style\
        .format(
-            {  # Format cells in each column for precision etc.
+            {  # Format the cells in each column for precision etc.
             "Prevalence": "{:-.4f}",
             "TP": "{:-.4f}",
             "FP": "{:-.4f}",
@@ -682,8 +683,13 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      .set_properties(subset=["FNPercent"],**{"background-color":"pink","color":"black"})\
      .apply(DataFrame_Highlight_PrevInt_Row, axis=1)
     
-    st.info("🟢 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS.  \r"
-            "The 'Prevalence of interest' row is highlighted.")
+    st.info("🟢📄 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS.  \r"
+            "The 'Prevalence of interest' row is highlighted.  \r"
+            "You can enlarge the table by clicking the 'View full screen' "
+            " icon located at the top right of the table.  \r"
+            "'Float' the mouse over the table and the 'View full screen' "
+            "icon will appear.")
+    
     st.dataframe(data=StylerA, width=None, height=None)
 
 
@@ -692,22 +698,13 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     # - The dataframe is converted to a csv file.
     # - That file is downloaded to the browsers download location.
     # - There is no "save as" menu. The file name is hard coded.
-    DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
-    helpstr = f"""You can save the data frame to your computer using 
-        this button.  \r
-        The file will be called {G.Link40}.   \r
-        The file will be in CSV format, (Comma Separated Variable).   \r
-        The file will be saved in your browser's default download location
-        on your computer.  \r
-        You can enlarge the table by clicking the 'View fullscreen' icon
-        located at the top right of the table.  \r
-        'Float' the mouse over the table and the 'View fullScreen'
-        icon will appear.
-         """
     
+    DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
+    helpstr = ("The file will be saved in your browser's default download "
+              " location on your computer. ")
     col1, col2 = st.columns(2)
     with col1:     
-        st.download_button(label="⚙️ Download The DataFrame As A CSV File", 
+        st.download_button(label="👇 Download The DataFrame As A CSV File", 
                            data=DataFrame_CSV, 
                            file_name=G.Link40, 
                            mime= "text/csv",
@@ -721,9 +718,9 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     with col2:    
         # NOTE !! If we use a styler on the grid we can pass that instead
         #         of the dataframe and preserve all stylings in the excel file.
-        df_xlsx = DataFrame_To_Excel(StylerA)
-        st.download_button(label="📥 Download DataFrame To An Excel File",
-            data=df_xlsx ,
+        DataFrameAsExcel = DataFrame_Convert_To_Excel(StylerA)
+        st.download_button(label="👇 Download DataFrame To An Excel File",
+            data=DataFrameAsExcel ,
             help="In an Excel file any cell highlighting or other "
                  "styling will be preserved.",  
             file_name= "df_CSV_To_Excel.xlsx")   
@@ -740,17 +737,17 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #   proper pdf viewer.
     tempstr = ("You can read this programs's documentation in the project's "
      "Gihub project 'repository'.   \n" 
-     "Just click the links below or look in the 'Help' menu. "   
-     "Look for '≡' (3 horizontal lines) then select 'Get Help'.  \r"
+     "    Look in the 'Help' menu of this web page. (Top right).  \r"   
+     "Look for '≡' (3 horizontal lines) then select 'About'.  \r   \r"
      "Github only provides primitive document viewers for pdf documents.   \r"
      "So you may wish to download and view documentation on your computer.  \r"
      "Then you will be able to navigate the documents using indexes, "
      "navigation panes, search  etc." ) 
      
-    with st.expander("🟢 THIS PROGRAM'S DOCUMENTATION."):
+    with st.expander("📖📚  THIS PROGRAM'S DOCUMENTATION. (2 x &nbsp;)  (HELP MENU ABOVE '≡'. Then 'About')."):
       st.caption(tempstr) 
-      st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
-      st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")    
+      # st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
+      # st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")    
         
         
     ###########################################################################
@@ -758,7 +755,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #  Github basing of videos does not allow raw address of large files.
     #  Google basing of videos  does not work because it downloads too slowly.
     #  So until I can figure out how to base videos at github we use Youtube.
-    st.info("🟢  A VIDEO DEMONSTRATING THIS PROGRAM'S FEATURES.")   
+    st.info("🎬  A VIDEO DEMONSTRATING THIS PROGRAM'S FEATURES.")   
     st.video(G.Link20)
    
     return  # End of function: GUI_Right_Panel_Build
@@ -766,12 +763,12 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
 def GUI_HelpMenu_Build():
     # ++++ Set up a typical "About/Help" menu for the webpage.
     #  - The set_page_config command can only be used once per run.
-    #  - The set_page_config command be the first Streamlit command used.
+    #  - The set_page_config command must be the first Streamlit command used.
     #  - New line marker \n must be preceeded by at least two blanks to work.
     st.set_page_config  (
      page_title = "Screening Tests.", 
      
-     page_icon = ":confused:",
+     page_icon = "🦡",
      
      layout="centered", # or "wide".
         # 'wide' gives a bigger display. 
@@ -784,14 +781,20 @@ def GUI_HelpMenu_Build():
      
      # \r requires two preceeding spaces to work.
      menu_items={ # These appear as the webpage "about" menu items.
-     "Get Help  ":  G.Link01,
+     "Get Help  ": G.Link01,
      "Report a bug  ": G.Link04,
-     'About': "  \rProgram: "           +  G.ThisModule_FileName 
+     'About': "  \rProgram: "           + G.ThisModule_FileName 
             + "  \rProject:  "          + G.ThisModule_Project
             + "  \rProgram Purpose:  "  + G.ThisModule_Purpose 
-            + "  \rAuthor:  "           +  G.ThisModule_Author   
-            + "  \rContacts:  "         +  G.ThisModule_Contact
-            + "  \rVersion:   "         + G.ThisModule_Version               
+            + "  \rAuthor:  "           + G.ThisModule_Author   
+            + "  \rContacts:  "         + G.ThisModule_Contact
+            + "  \rVersion:   "         + G.ThisModule_Version 
+            + "  \rProgram Documentation: " 
+                    +  f" [ Link To Program Documentation.]({G.Link01})"  
+            + "  \rProject Files:    "  
+                    +  f" [ Link To All Of The Projects Files.]({G.Link02})"  
+            + "  \rReport A Bug:    "  
+                   +  f" [ Link To Report A Bug.]({G.Link04})"  
                }
                       )
     return()  # End of function: GUI_HelpMenu_Build
@@ -948,7 +951,7 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
     #  screens. So we avoid any feature that sets absolute size for anything.
     
     # G.Fig1.add_annotation(
-    #     text=Plot_Report_Build(formatfor="streamlit"), 
+    #     text="report here", 
     #         align="left",
     #         showarrow=False,
     #         xref="paper", yref="paper",
@@ -959,31 +962,40 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
     return() # End of function:   Plot_Build_Plotly_GO()
 
 def Plot_Report_Build(formatfor="regular"):
+
+    if  formatfor == "streamlit": 
+        boldit = "**"
+        ind = " _ " 
+        eol =  ".  \r"  
+        G.UsersReportTitle=G.UsersReportTitle.replace(". ",eol) + eol
+    else: 
+        boldit = ""
+        ind = " - " 
+        eol = "  \n"
+    
+    header = "**REPORT ON YOUR SCREENING TEST** "
     if G.UsersReportTitle == None \
        or G.UsersReportTitle == ""  \
        or G.UsersReportTitle.isspace() :
-       G.UsersReportTitle = "Here is the report on your screening test." 
-       
-    G.Plot_Report_Long = str(
-       G.UsersReportTitle +  "  \n" +
-       " - The Disease Population Prevalence Varies From " +
-       "{:.5f}".format(G.PrevStart)  +
-       " To {:.5f}".format(G.PrevEnd) + ".   \n"
-       " - Population = {:,}   \n".format(G.PopSize) +
-       " - Sensitivity = {:.4f}   \n".format(G.Sens) +
-       " - Specificity = {:.4f}   \n".format(G.Spec) +
-       " - Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
-        " - Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
-      " - Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
-       G.False_Pos_Message + "  \n" +
-       G.False_Neg_Message    ) 
-    
-    # If the text is intended for an html text target use the html line break.
-    if formatfor == "streamlit":
-        G.Plot_Report_Long = G.Plot_Report_Long.replace("\n", "<br>")
-
-    
-    return(G.Plot_Report_Long)   #  End of function: Plot_Report_Build
+       G.UsersReportTitle = header    
+    else:
+        G.UsersReportTitle = header + "  \n" + G.UsersReportTitle 
+             
+    G.Plot_Report = str(
+       G.UsersReportTitle  + "  \n" +
+       ind + "The disease prevalence varies from " +
+             "{:.5f}".format(G.PrevStart)  +
+             " to {:.5f}".format(G.PrevEnd) + ".   \n" +
+       ind + "" + G.False_Pos_Message + "  \n" +      
+       ind + "" + G.False_Neg_Message + "  \n" +
+       ind + "Test Sensitivity = {:.4f}   \n".format(G.Sens) +
+       ind + "Test Specificity = {:.4f}   \n".format(G.Spec) +
+       ind + "Plot Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
+       ind + "Plot Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
+       ind + "Plot Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
+       ind + "Population = {:,}   \n".format(G.PopSize) 
+                       ) 
+    return(G.Plot_Report)   #  End of function: Plot_Report_Build
 
 def Plot_Streamlit_FullScreenIcon_Format():
     # This function increases the visibility of the Streamlit
@@ -1034,7 +1046,7 @@ def Msg_Set(TextString):
     FormattedText = TextString
     ErrStr = TextString[0:5].upper()  
     if ErrStr == "ERROR":
-       FormattedText = ("❌  There is an error in your input. "
+       FormattedText = ("❌  There is an error in your input.  \r"
                        f"{FormattedText}  Please correct and try again.")
     S.MsgText = FormattedText
     G.Msg_Current = FormattedText
@@ -1070,13 +1082,14 @@ def StMarkdown(TextToBeFormated="", color="black",
                )
     return(md)  # End of function: StMarkdown
 
-def DataFrame_To_Excel(df):
+def DataFrame_Convert_To_Excel(df):
+    sheetname = "ScreeningTest"
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine="xlsxwriter")
-    df.to_excel(writer, index=False, sheet_name="Sheet1")
+    df.to_excel(writer, index=True, sheet_name=sheetname)
     workbook = writer.book
-    worksheet = writer.sheets["Sheet1"]
-    format1 = workbook.add_format({"num_format": '0.00'}) 
+    worksheet = writer.sheets[sheetname]
+    format1 = workbook.add_format({"num_format": '00.00000'}) 
     worksheet.set_column("A:A", None, format1)  
     writer.save()
     processed_data = output.getvalue()
