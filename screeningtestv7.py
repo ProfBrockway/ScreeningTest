@@ -644,32 +644,6 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                     config={'displayModeBar': True}, # Force plotly toolbar.
                     sharing="streamlit")
     
-
-    
-    ###########################################################################
-    # +++ MAKE THIS PROGRAM'S DOCUMENTATION AVAILABLE.
-    #   We  base the pdf file in the github repository for the project.
-    #   The github using the github link to the address displays
-    #   the pdf file in the primitive github pdf view which does not
-    #   have basic features, especially the pdf document index.
-    #   I have not been able to fix this problem so for now, the pdf
-    #   is displayed and the user advised to download it a use a 
-    #   proper pdf viewer.
-    tempstr = ("You can read this programs's documentation in the project's "
-     "Gihub project 'repository'.   \n" 
-     "Just click the links below or look in the 'Help' menu. "   
-     "Look for '≡' (3 horizontal lines) then select 'Get Help'.  \r"
-     "Github only provides primitive document viewers for pdf documents.   \r"
-     "So you may wish to download and view documentation on your computer.  \r"
-     "Then you will be able to navigate the documents using indexes, "
-     "navigation panes, search  etc." ) 
-     
-    with st.expander("🟢 THIS PROGRAM'S DOCUMENTATION."):
-      st.caption(tempstr) 
-      st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
-      st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")
-
- 
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
@@ -753,6 +727,31 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
             help="In an Excel file any cell highlighting or other "
                  "styling will be preserved.",  
             file_name= "df_CSV_To_Excel.xlsx")   
+    
+        
+    ###########################################################################
+    # +++ MAKE THIS PROGRAM'S DOCUMENTATION AVAILABLE.
+    #   We  base the pdf file in the github repository for the project.
+    #   The github using the github link to the address displays
+    #   the pdf file in the primitive github pdf view which does not
+    #   have basic features, especially the pdf document index.
+    #   I have not been able to fix this problem so for now, the pdf
+    #   is displayed and the user advised to download it a use a 
+    #   proper pdf viewer.
+    tempstr = ("You can read this programs's documentation in the project's "
+     "Gihub project 'repository'.   \n" 
+     "Just click the links below or look in the 'Help' menu. "   
+     "Look for '≡' (3 horizontal lines) then select 'Get Help'.  \r"
+     "Github only provides primitive document viewers for pdf documents.   \r"
+     "So you may wish to download and view documentation on your computer.  \r"
+     "Then you will be able to navigate the documents using indexes, "
+     "navigation panes, search  etc." ) 
+     
+    with st.expander("🟢 THIS PROGRAM'S DOCUMENTATION."):
+      st.caption(tempstr) 
+      st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
+      st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")    
+        
         
     ###########################################################################
     # +++ SHOW A VIDEO DEMONSTRATING THIS PROGRAM.
