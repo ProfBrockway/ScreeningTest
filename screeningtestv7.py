@@ -27,7 +27,7 @@
 # TO DO
 # 	-  Create documentation including a documentation vidio and deploy it
 #     - https://docs.python-guide.org/writing/documentation/
-#   	🎬⚙️👇📽️ :books: 1F9A1	🦡 📥 ⚙  ⚠ ⛔ 🚫 ❔      ❕ ✅ ❌   '\u25b2'  u"\U0001F9A1"   \Uf0ed  \U0001F4DA \U0001F4EC  
+#   	🎬⚙️👇📽️📄  :books: 1F9A1	🦡 📥 ⚙  ⚠ ⛔ 🚫 ❔      ❕ ✅ ❌   '\u25b2'  u"\U0001F9A1"   \Uf0ed  \U0001F4DA \U0001F4EC  
 # For final submission.
 #  -spell check comments to get rid of gross errors.
 # - check results carefully against another calculator.
@@ -214,13 +214,13 @@ G = Global_Variables()    # Instantiate our global variables.
 
 def MainLine():
     # Remember this program is rerun by Streamlit every time the GUI is 
-    # displayed and he "form run button" is clicked by the user.
+    # displayed and the "form run button" is clicked by the user.
     # So we have to keep track of the conversation state.
-    #  - We preserve cnverstation state and other "static" values across 
+    #  - We preserve converstation state and other "static" values across 
     #    reinvocations in the Streamlit "Static" dictionary.
     #  - We perform a "one time"  program initialization when the code is
     #    first loaded. 
-    #  - On every reinvocation we perform "every time" initialization.
+    #  - On every invocation we perform "every time" initialization.
     
     
     ConsoleClear()  # Clear the internal IPyhon console.
@@ -233,7 +233,7 @@ def MainLine():
     else:  # We are responding to a session reply from the user.       
         Initialization_Perform_EveryRun()  # Do "every run" initialization.
         
-        # Validate and internalize users'input.
+        # Validate and internalize the user's input.
         InputOK = User_Input_Validate_And_Internalize()
         if InputOK == True:
             # Build a table for the efficacies of the screening test across
@@ -246,7 +246,7 @@ def MainLine():
            st.error(G.Msg_Current) # Show the error in the right panel.
 
     # Display the results and wait for next user input.
-    GUI_Build_Basic_Layout()
+    GUI_Build_Vertical_Menu()
     return()  # End of function: MainLine.
 
 def Initialization_Perform_EveryRun():
@@ -483,7 +483,7 @@ def User_Input_Process():
     # End of 'For each PrevCurrent'
     return # End of function: User_Input_Process
 
-def GUI_Build_Basic_Layout():        # Build the GUI.
+def GUI_Build_Vertical_Menu():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
     #   on the left and a plot and display area on the right.
     
@@ -495,6 +495,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
 
     with Form1:
 
+        
         # Create a textbox for displaying instructions and error messages.
         st.text_area(
             key="MsgText",   # Value will be placed in S.MsgText'].
@@ -504,7 +505,7 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
             help="""The instructions box offers instructions and reports errors
                     in input.""",
             on_change=None)
-
+         
         # Add a form submit button.
         # Every "form" must have exactly one form_submit_button.
         st.form_submit_button(
@@ -515,26 +516,9 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
                     "button to draw your plot.",
                     args=(),
                     kwargs=())
-
+        
         # Create input boxes in the toolbar for our user specifed variables.
-        # Input the Population Size.
-        st.number_input(
-            key="PopSize",        # Value will be placed in S.Popsize'].
-            value=100,
-            label="Population",
-            min_value=1,
-            max_value=1000,
-            step=1,
-            format="%i",
-            help="""Enter the population.[100,1000].   
-            Population does not effect the results which are all percentages 
-            of population.   
-            Changing Population changes only the number of data points.""",
-            on_change=None,
-            args=None,
-            kwargs=None,
-            disabled=False)
-
+        
         # Input the Test Sensitivity.
         st.number_input(
             key="Sens",              # Value will be placed in S.Sens'].
@@ -603,18 +587,39 @@ def GUI_Build_Basic_Layout():        # Build the GUI.
                   A decimal percentage  [ 0,  1 ]"""),
             on_change=None)
  
-        # Create a textbox user to input the report title.
+        # Create a textbox user to input the report annotation.
         st.text_area(
             key="UserReportAnnotation",   # Value will be placed in S.MsgText'].
             label="Report Annotation",
             height=None,
             max_chars=None,
-            help="""Enter a title for the report on your screening test.""",
+            help=("Optional. Enter an annotation for the report on your "
+                  "screening test.  \r" 
+                  "Type a simple stream of text. Each 'period+Space' will "
+                  "start a new line."),
             on_change=None)
+        
+        # Input the Population Size.
+        st.number_input(
+            key="PopSize",        # Value will be placed in S.Popsize'].
+            value=100,
+            label="Population",
+            min_value=1,
+            max_value=1000,
+            step=1,
+            format="%i",
+            help="""Enter the population.[100,1000].   
+            Population does not effect the results which are all percentages 
+            of population.   
+            Changing Population changes only the number of data points.""",
+            on_change=None,
+            args=None,
+            kwargs=None,
+            disabled=False)
         # End of "With Form"
     
  
-    return()  # End of function: GUI_Build_Basic_Layout
+    return()  # End of function: GUI_Build_Vertical_Menu
 
 def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
@@ -625,21 +630,15 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     Plot_Streamlit_FullScreenIcon_Format()
      
     # Build the plot using Plotly graph objects (GO)(not plotly express).
-    Plot_Build_Plotly_GO()    
-    
-    st.info("👍  HERE IS THE SCREENING TEST PLOT YOUR REQUESTED.   \r"
-            "   Click the legend to display or hide the various variables.")
-    
+    Plot_Build()    
+        
     # Display a Plot Report box on the GUI.
     st.info(Plot_Report_Build(formatfor="streamlit"))  
     
     # Place the Plotly plot on the GUI.
-    #  use_container_width
-    #      If True, set the chart width to the column width. 
-    #     This takes precedence over the figure's native width value.
-    #     Don't set height or width anywhere. Let Streamlit and Plotly
-    #     scale everything. Otherwise the GUI won't adjust properly to
-    #     different size screens.
+    # - Don't set height or width on the plot or anywhere else. 
+    # - Use 'use_container_width' to letStreamlit and Plotly scale everything. 
+    #   Otherwise the GUI won't adjust properly to  different size screens.
     st.plotly_chart(G.Fig1, 
                     use_container_width=True, 
                     config={'displayModeBar': True}, # Force plotly toolbar.
@@ -683,12 +682,13 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      .set_properties(subset=["FNPercent"],**{"background-color":"pink","color":"black"})\
      .apply(DataFrame_Highlight_PrevInt_Row, axis=1)
     
-    st.info("🟢📄 THE DATA TABLE GENERATED BY YOUR PARAMETERS FOLLOWS.  \r"
-            "The 'Prevalence of interest' row is highlighted.  \r"
-            "You can enlarge the table by clicking the 'View full screen' "
-            " icon located at the top right of the table.  \r"
-            "'Float' the mouse over the table and the 'View full screen' "
-            "icon will appear.")
+    with st.expander("🟢 THE DATA TABLE USED FOR THE PLOT FOLLOWS."):
+        st.info(
+                "The 'Prevalence of interest' row is highlighted.  \r"
+                "You can enlarge the table by clicking the 'View full screen' "
+                " icon.  \r"
+                "'Float' the mouse over the table and the 'View full screen' "
+                "icon will appear.")
     
     st.dataframe(data=StylerA, width=None, height=None)
 
@@ -704,7 +704,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
               " location on your computer. ")
     col1, col2 = st.columns(2)
     with col1:     
-        st.download_button(label="👇 Download The DataFrame As A CSV File", 
+        st.download_button(label="👇 Download The DataFrame To A CSV File", 
                            data=DataFrame_CSV, 
                            file_name=G.Link40, 
                            mime= "text/csv",
@@ -728,23 +728,19 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
         
     ###########################################################################
     # +++ MAKE THIS PROGRAM'S DOCUMENTATION AVAILABLE.
-    #   We  base the pdf file in the github repository for the project.
-    #   The github using the github link to the address displays
-    #   the pdf file in the primitive github pdf view which does not
-    #   have basic features, especially the pdf document index.
-    #   I have not been able to fix this problem so for now, the pdf
-    #   is displayed and the user advised to download it a use a 
-    #   proper pdf viewer.
+    #   We host the documentation pdf file in the project's github repository.
+    #   At github the pdf file can only be viewed in the primitive github pdf 
+    #   viewer which does not have basic features, especially the pdf document
+    #   index. I have not been able to fix this problem so for now the 
+    #   user is advised to download the documentation and use a proper local
+    #   pdf viewer.
     tempstr = ("You can read this programs's documentation in the project's "
      "Gihub project 'repository'.   \n" 
      "    Look in the 'Help' menu of this web page. (Top right).  \r"   
-     "Look for '≡' (3 horizontal lines) then select 'About'.  \r   \r"
-     "Github only provides primitive document viewers for pdf documents.   \r"
-     "So you may wish to download and view documentation on your computer.  \r"
-     "Then you will be able to navigate the documents using indexes, "
-     "navigation panes, search  etc." ) 
-     
-    with st.expander("📖📚  THIS PROGRAM'S DOCUMENTATION. (2 x &nbsp;)  (HELP MENU ABOVE '≡'. Then 'About')."):
+     "Look for '≡' (3 horizontal lines) then select 'About'.   \r")
+      
+    with st.expander("📖📚  THIS PROGRAM'S DOCUMENTATION.  \r"
+                     "(See HELP MENU ABOVE:  '≡'. Then 'About').") :
       st.caption(tempstr) 
       # st.write(f" [ Link To This programs's Documentation.]({G.Link01})")
       # st.write(f" [ Link To All Of The Projects Files.]({G.Link02})")    
@@ -762,9 +758,9 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
 
 def GUI_HelpMenu_Build():
     # ++++ Set up a typical "About/Help" menu for the webpage.
-    #  - The set_page_config command can only be used once per run.
-    #  - The set_page_config command must be the first Streamlit command used.
-    #  - New line marker \n must be preceeded by at least two blanks to work.
+    # - The set_page_config command can only be used once per run.
+    # - The set_page_config command must be the FIRST Streamlit command used.
+    # - New line marker \n must be preceeded by at least two blanks to work.
     st.set_page_config  (
      page_title = "Screening Tests.", 
      
@@ -788,7 +784,7 @@ def GUI_HelpMenu_Build():
             + "  \rProgram Purpose:  "  + G.ThisModule_Purpose 
             + "  \rAuthor:  "           + G.ThisModule_Author   
             + "  \rContacts:  "         + G.ThisModule_Contact
-            + "  \rVersion:   "         + G.ThisModule_Version 
+            + "  \rProgram Version:  "  + G.ThisModule_Version 
             + "  \rProgram Documentation: " 
                     +  f" [ Link To Program Documentation.]({G.Link01})"  
             + "  \rProject Files:    "  
@@ -799,7 +795,7 @@ def GUI_HelpMenu_Build():
                       )
     return()  # End of function: GUI_HelpMenu_Build
 
-def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
+def Plot_Build(): # Create our plot using Plotly Graph Objects.
     # Plotly graph objects (GO) are for building plots "by hand".
     # GO graphing gives more control than graphing with Plotly Express.
     
@@ -959,41 +955,40 @@ def Plot_Build_Plotly_GO(): # Create our plot using Plotly Graph Objects.
     #         y=-0.25, yanchor = "bottom",
     #         bordercolor="black", borderwidth=0)
         
-    return() # End of function:   Plot_Build_Plotly_GO()
+    return() # End of function:   Plot_Build()
 
 def Plot_Report_Build(formatfor="regular"):
 
     if  formatfor == "streamlit": 
         boldit = "**"
         ind = " _ " 
-        eol =  ".  \r"  
-        G.UsersReportTitle=G.UsersReportTitle.replace(". ",eol) + eol
+        eol =   ".  \r"  # ". \u000D"
     else: 
         boldit = ""
         ind = " - " 
-        eol = "  \n"
-    
-    header = "**REPORT ON YOUR SCREENING TEST** "
+        
+    header = "**👍 REPORT ON YOUR SCREENING TEST** "
     if G.UsersReportTitle == None \
        or G.UsersReportTitle == ""  \
-       or G.UsersReportTitle.isspace() :
+       or G.UsersReportTitle.isspace():
        G.UsersReportTitle = header    
     else:
-        G.UsersReportTitle = header + "  \n" + G.UsersReportTitle 
+        G.UsersReportTitle=G.UsersReportTitle.replace(". ",eol) 
+        G.UsersReportTitle = header + "  \r" + G.UsersReportTitle 
              
     G.Plot_Report = str(
        G.UsersReportTitle  + "  \n" +
-       ind + "The disease prevalence varies from " +
+       ind + "In this test the disease prevalence varies from " +
              "{:.5f}".format(G.PrevStart)  +
              " to {:.5f}".format(G.PrevEnd) + ".   \n" +
-       ind + "" + G.False_Pos_Message + "  \n" +      
-       ind + "" + G.False_Neg_Message + "  \n" +
-       ind + "Test Sensitivity = {:.4f}   \n".format(G.Sens) +
-       ind + "Test Specificity = {:.4f}   \n".format(G.Spec) +
-       ind + "Plot Prevalence Start = {:.5f}   \n".format(G.PrevStart) +
-       ind + "Plot Prevalence End = {:.5f}   \n".format(G.PrevEnd) +
-       ind + "Plot Prevalence Of Interest = {:.6f}   \n".format(G.PrevInt) +
-       ind + "Population = {:,}   \n".format(G.PopSize) 
+       ind + "The Prevalence Of Interest = {:.6f}.  \n".format(G.PrevInt) +      
+       ind +  G.False_Pos_Message + "  \n" +      
+       ind +  G.False_Neg_Message + "  \n" +
+       ind + "Test Sensitivity = {:.4f}.   \n".format(G.Sens) +
+       ind + "Test Specificity = {:.4f}.   \n".format(G.Spec) +
+       ind + "Plot Prevalence Start = {:.5f}.   \n".format(G.PrevStart) +
+       ind + "Plot Prevalence End = {:.5f}.   \n".format(G.PrevEnd) +
+       ind + "Population = {:,}.   \n".format(G.PopSize) 
                        ) 
     return(G.Plot_Report)   #  End of function: Plot_Report_Build
 
@@ -1043,9 +1038,10 @@ def Validate_Integer(TextString):
         return(tempvar,True)
 
 def Msg_Set(TextString):
+    # Format text for our output message text box.
     FormattedText = TextString
     ErrStr = TextString[0:5].upper()  
-    if ErrStr == "ERROR":
+    if ErrStr == "ERROR": # If this is an error message append an error prefix.
        FormattedText = ("❌  There is an error in your input.  \r"
                        f"{FormattedText}  Please correct and try again.")
     S.MsgText = FormattedText
