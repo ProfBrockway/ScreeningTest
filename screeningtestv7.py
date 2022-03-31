@@ -725,6 +725,47 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                  "styling will be preserved.",  
             file_name= "df_CSV_To_Excel.xlsx")   
     
+    ###########################################################################
+    #             DOWNLOAD THE PLOT AS INTERACTIVE HTML
+
+    # Write the plot as an INTERACTIVE ACTIVE plot to disk.
+    import base64
+    from io import StringIO
+    testurl = r"G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\screeningtest\ActivePlot.html"
+    G.Fig1.write_html(testurl)    
+    
+    mybuff = StringIO()
+    G.Fig1.write_html(mybuff, include_plotlyjs='cdn')
+    mybuff = BytesIO(mybuff.getvalue().encode())
+    b64 = base64.b64encode(mybuff.read()).decode()
+    href = f'<a href="data:text/html;charset=utf-8;base64, {b64}" download="plot.html">Download plot</a>'
+    st.markdown(href, unsafe_allow_html=True)
+        
+    
+    #st.markdown(href, unsafe_allow_html=True)
+    st.download_button(label="👇 Download Interactive Plot", 
+                       data=b64, 
+                       file_name=testurl, 
+                       mime= "text/html",
+                       key="InteractivePlot", 
+                       help="?V", 
+                       on_click=None, 
+                       args=None,
+                       kwargs=None, 
+                       disabled=False)
+    
+   
+    
+   
+    # data = [(1, 2, 3)]
+    # # When no file name is given, pandas returns the CSV as a string, nice.
+    # df = pd.DataFrame(data, columns=["Col1", "Col2", "Col3"])
+    # csv = df.to_csv(index=False)
+    # b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    # href = f'<a href="data:file/csv;base64,{b64}">Download CSV File</a> (right-click and save as &lt;some_name&gt;.csv)'
+    # st.markdown(href, unsafe_allow_html=True)    
+        
+        
         
     ###########################################################################
     # +++ MAKE THIS PROGRAM'S DOCUMENTATION AVAILABLE.
