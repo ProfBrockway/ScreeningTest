@@ -183,7 +183,9 @@ class Global_Variables():  # A class creating all global variables.
     DataTable = pd.DataFrame(
         columns=["Prevalence",
                  "FPPercent",
+                 "PPV",
                  "FNPercent",
+                 "NPV",
                  "PrevInt",
                  "Sens",
                  "Spec",
@@ -192,8 +194,6 @@ class Global_Variables():  # A class creating all global variables.
                  "TN",
                  "FN",
                  "ACC",
-                 "PPV",
-                 "NPV",
                  "Population" 
                 ]
                                )
