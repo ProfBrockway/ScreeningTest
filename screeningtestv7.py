@@ -644,6 +644,22 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                     config={'displayModeBar': True}, # Force plotly toolbar.
                     sharing="streamlit")
     
+    ###########################################################################
+    # SHOW BUTTER DOWNLOAD THE PLOT AS AN INDEPENDENT INTERACTIVE HTML PAGE 
+
+    PlotAsInteractiveHTML=plotly.io.to_html(G.Fig1)
+    st.download_button(
+        label="👇 Download Interactive Plot", 
+        data=PlotAsInteractiveHTML, 
+        file_name="activeplot2.html", 
+        mime= "text/html",
+        key="InteractivePlot", 
+        help="Download the plot as an independent interact html page.", 
+        on_click=None, 
+        args=None,
+        kwargs=None, 
+        disabled=False)
+    
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
@@ -724,37 +740,6 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
             help="In an Excel file any cell highlighting or other "
                  "styling will be preserved.",  
             file_name= "df_CSV_To_Excel.xlsx")   
-    
-    ###########################################################################
-    #             DOWNLOAD THE PLOT AS INTERACTIVE HTML
-
-    # Write the plot as an INTERACTIVE ACTIVE plot to disk.
-    import base64
-    from io import StringIO
-    testurl = r"G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\screeningtest\ActivePlot.html"
-    G.Fig1.write_html(testurl)    
-    
-    mybuff = StringIO()
-    G.Fig1.write_html(mybuff, include_plotlyjs='cdn')
-    mybuff = BytesIO(mybuff.getvalue().encode())
-    b64 = base64.b64encode(mybuff.read()).decode()
-    href = f'<a href="data:text/html;charset=utf-8;base64, {b64}" download="plot.html">Download plot</a>'
-    st.markdown(href, unsafe_allow_html=True)
-        
-    
-    #st.markdown(href, unsafe_allow_html=True)
-    st.download_button(label="👇 Download Interactive Plot", 
-                       data=b64, 
-                       file_name=testurl, 
-                       mime= "text/html",
-                       key="InteractivePlot", 
-                       help="?V", 
-                       on_click=None, 
-                       args=None,
-                       kwargs=None, 
-                       disabled=False)
-    
-   
     
    
     # data = [(1, 2, 3)]
