@@ -1,4 +1,4 @@
-#  streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtestv7.py"
+#  streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtest.py"
 ###############################################################################
 #                            ScreeningTest
 ###############################################################################
