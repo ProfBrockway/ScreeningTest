@@ -14,7 +14,7 @@
 # How to run this program:
 # - Enter the following link into a web browser.
 # - The web page will then explain how to run the program and its plots.
-# https://share.streamlit.io/profbrockway/screeningtest/main/screeningtestv7.py
+# https://share.streamlit.io/profbrockway/screeningtest/main/screeningtest.py
 #
 #
 ###############################################################################
@@ -26,8 +26,7 @@
 
 # TO DO
 # 	-  Create documentation including a documentation vidio and deploy it
-#     - https://docs.python-guide.org/writing/documentation/
-#   	🎬⚙️👇📽️📄  :books: 1F9A1	🦡 📥 ⚙  ⚠ ⛔ 🚫 ❔      ❕ ✅ ❌   '\u25b2'  u"\U0001F9A1"   \Uf0ed  \U0001F4DA \U0001F4EC  
+#  
 # For final submission.
 #  -spell check comments to get rid of gross errors.
 # - check results carefully against another calculator.
@@ -75,7 +74,9 @@ class Global_Variables():  # A class creating all global variables.
     # Project Folder at Github.
     Link02 = "https://github.com/ProfBrockway/ScreeningTest"
     # Where to report a bug.
-    Link04 = "https://github.com/ProfBrockway/ScreeningTest/issues"  
+    Link04 = "https://github.com/ProfBrockway/ScreeningTest/issues"
+    # Link to this programs source code
+    Link06 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/screeningtest.py"
     # App documentation video.
     Link20 = "https://youtu.be/DkpuAnnDjyo"
     # Name of downloaded table file
@@ -813,6 +814,8 @@ def GUI_HelpMenu_Build():
             + "  \rProgram Version:  "  + G.ThisModule_Version 
             + "  \rProgram Documentation: " 
                     +  f" [ Link To Program Documentation.]({G.Link01})"  
+            + "  \rProgram Source Code:    "  
+                            +  f" [ Link To Program Source Code]({G.Link06})"         
             + "  \rProject Files:    "  
                     +  f" [ Link To All Of The Projects Files.]({G.Link02})"  
             + "  \rReport A Bug:    "  
