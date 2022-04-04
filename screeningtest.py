@@ -1,3 +1,7 @@
+# TO DO
+#  - We report (eg) the claimed absolute numbers of true postitives. 
+# Add an 'adjusted' for prevalence actual true positives to the report.
+
 ##############################################################################
 #                           ScreeningTest
 ##############################################################################
@@ -8,19 +12,18 @@
 #     bilisolyr@ccsu.edu  https://www2.ccsu.edu/faculty/bilisolyr
 # Program: screeningtest.py
 # Purpose: To demonstrate the effect of disease prevalence on the
-#           reliability of medical screening tests.
-# 	 
-# How to run this program:
+#          reliability of medical screening tests.
+#
+############################################################################### 	 
+#                      How To Run This Program
 # - Enter the following link into a web browser.
 # - The web page will then explain how to run the program and its plots.
 # https://share.streamlit.io/profbrockway/screeningtest/main/screeningtest.py
 
-
 ###############################################################################
-#
-#  Testing this program on a development computer. 
-#  - To test the app on a local (undeployed_) server and see our web page
-#  - locally enter the following command in the Anaconda console.
+#           How To Run This Program On A Development Computer. 
+#  - To test the app on a local (undeployed) server and see our web page
+#    locally, enter the following command in the Anaconda console.
 #  streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtest.py"
 ###############################################################################
 
@@ -52,12 +55,11 @@ class Global_Variables():  # A class creating all global variables.
     ThisModule_FullPath  = os.path.abspath(__file__)
     ThisModule_FileName = os.path.basename(ThisModule_FullPath)
     ThisModule_ProjectPath = os.path.dirname(ThisModule_FullPath)
-  
-    
+      
     # +++ RESOURCE LINKS Etc  Pictures/Videos/Files etc stored online.
     #   Where possible we base our resources in this program's repostitory
     #   at github. If github basing is not possible or inadequate
-    #   we have to use another cloud storage site, eg Google drive.
+    #   we have to use another cloud storage site, eg Youtube, Google drive.
          
     # Program Help/Documentation.    
     Link01 = ("https://github.com/ProfBrockway/ScreeningTest/blob/" 
@@ -70,11 +72,13 @@ class Global_Variables():  # A class creating all global variables.
     Link06 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/screeningtest.py"
     # App documentation video.
     Link20 = "https://youtu.be/DkpuAnnDjyo"
-    # Name of downloaded table file
-    Link40 = "ScreeningTestDataFrame.csv"
     
-    Debug = False
-    # +++ END OF RESOURCES AND OTHER LINKS OR VARIABLES THAT MIGHT CHANGE.
+    # Filenames.
+    DataTable_Download_FileName_xcl = "ScreeningTestDataFrame.xlsx"
+    DataTable_Download_FileName_CSV = "ScreeningTestDataFrame.csv"
+    Report_Download_FileName = "ScreeningTestReport.txt"
+    Fig1_Download_FileName = "ScreeningTestFig1.html"
+    Fig2_Download_FileName = "ScreeningTestFig2.html"
     ###########################################################################
  
     # ++++  THE STATITICAL VARIABLES OF THE MEDICAL SCREENING TEST  ++++++++++
@@ -158,13 +162,22 @@ class Global_Variables():  # A class creating all global variables.
     # THE RANGE OF PREVALENCES
     # A list to contain all the Prevs we will test and graph.
     PrevList = list([])
-    PrevStart = None       # PrevStart is input by the user.
-    PrevEnd = None         # PrevEnd is input by the user.
-    PrevInt = None         # PrevInt is input by the user.
+    PrevStart = None       # Input by the user.
+    PrevEnd = None         # Input by the user.
+    PrevInt = None         # Input by the user.
+
+    # Statistics extracted at the prevalence of interest.
+    PrevInt_FPPercent = None
+    PrevInt_FNPercent = None
+    PrevInt_PPV = None
+    PrevInt_NPV = None
+    PrevInt_TP = None
+    PrevInt_FP = None
+    PrevInt_TN = None
+    PrevInt_FN = None  
 
     # The report title input by the user.
-    UsersReportTitle = None
-    
+    UsersReportAnnotation = None
     
     # THE DATATABLE
     # The DataTable is a pandas dataframe (data table) to store our results.
@@ -193,14 +206,10 @@ class Global_Variables():  # A class creating all global variables.
     Plot1 = None
     Fig2 = None
     Plot2 = None
-    Msg01 =  "Enter the parameters of the medical screening test "\
-             "and click 'Plot Now' button."
+    Msg01 = "Enter the parameters of the medical screening test "\
+            "and click 'Plot Now' button."
     
     Plot_Report = None
-    PrevInt_FPPercent = None
-    PrevInt_FNPercent = None
-    PrevInt_PPV = None
-    PrevInt_NPV = None
 
 # End of Global Variables
 G = Global_Variables()    # Instantiate our global variables.
@@ -214,8 +223,7 @@ def MainLine():
     #  - We perform a "one time"  program initialization when the code is
     #    first loaded. 
     #  - On every invocation we perform "every time" initialization.
-    
-    
+        
     ConsoleClear()  # Clear the internal IPython console.
 
     # If this the initial session then create "Static/Persistent" variables.
@@ -231,10 +239,11 @@ def MainLine():
         if InputOK == True:
             # Build a table for the efficacies of the screening test across
             # the range of disease prevalences specified by the user.
-            User_Input_Process()
+            Plot_Generate_Data()
             # Plot the table of efficacies of the screening test.
             GUI_Right_Panel_Build()
             
+        # NOT the first invocation.    
         else:  # There is an error in the users input. 
            st.error(G.Msg_Current) # Show the error in the right panel.
 
@@ -348,127 +357,11 @@ def User_Input_Validate_And_Internalize():
        return(False)
  
     # Internalize the users report title.
-    G.UsersReportTitle =  S.UserReportAnnotation 
+    G.UsersReportAnnotation =  S.UserReportAnnotation 
     
     # If we fall through here the users input is all valid.
     S.MsgText = G.Msg01    # Reset the "Please enter test specs" message.
     return(True)  # End of function: User_Input_Validate_And_Internalize
-
-def User_Input_Process():
-    # Build table of statistics for the specified range of prevalences.
-    # For the specified range of prevalences (Eg Prevs from 0% to 100%) build
-    # a table with a row for each prevalence in the range and that
-    # prevalences' statistics.
-
-    # Create a list of population disease prevalences percentages
-    # over which  we  want to test the efficacy of the screening test.
-    G.PrevList.clear()   #  Instantiate the list of prevalences.
-    
-    # Avoid zero divide by altering a zero prevalence to a near zero number.
-    if G.PrevStart == 0:
-        G.PrevStart = 0.00000000000000000001
-        
-    # The increment controls the number of data points on the x axis.    
-    prev_increment = (G.PrevEnd - G.PrevStart) / 100
-    i = 0
-    G.PrevList.append(G.PrevStart)
-    while G.PrevList[i] < G.PrevEnd:
-        G.PrevList.append(G.PrevList[i] + prev_increment )
-        i = i + 1
-
-    # Process each of the Prev's in the list of Prev's to be tested.
-    # The stats for each prev are calculated and stored in a table row.
-    G.DataTable = G.DataTable[0:0] # Clear the DataTable. Retain its structure.
-    
-    # We will make a note of the false positive and negative rates at the
-    # users prevalence of interest.
-    G.PrevInt_FPPercent = None
-    G.PrevInt_FNPercent = None
-    G.PrevInt_PPV = None
-    G.PrevInt_NPV = None
-
-    
-    # Add rows to the DataTable
-    for PrevCurrent in G.PrevList:  
-        # TP  True Positive:  The test is positive & testee is infected.
-        # TP = PopulationSize * PopulationPrevalence * Sens.
-        G.TP = G.PopSize * PrevCurrent * G.Sens
-    
-        # FP  False Positive:  Test is positive & testee is NOT infected.
-        # FP = PopulationSize * (1 - PopulationPrevalence) * (1 - Spec)
-        G.FP =   G.PopSize * (1 - PrevCurrent) * (1 - G.Spec)
-    
-        # TN  True Negative: Test is negative & testee is NOT infected.
-        # TN = PopulationSize * (1- PopulationPrevalence) * Spec
-        G.TN = G.PopSize * (1 - PrevCurrent) * G.Spec
-    
-        # FN  False Negative: The test is negative & testee IS infected.
-        # FN = PopulationSize * PopulationPrevalence * (1 - Sens)
-        G.FN = G.PopSize * PrevCurrent * (1 - G.Sens)
-    
-        # Sens: Sens aka TPR / (True Positive Rate)
-        # The proportion of test positives that are correct.
-        # (When the test is positive & person IS infected).
-        G.Sens = G.TP / (G.TP + G.FN)
-    
-        # Spec: Spec aka TNR (True Negative Rate)
-        # The proportion of test negatives that are correct.
-        # (When the test is negative & person is not infected).
-        G.Spec = G.TN / (G.TN + G.FP)
-    
-        # PPV: Positive Predictive Value
-        # The probability that a testee is infected given & tested positive.
-        # Eg: A PPV = 11% means that of those who test positive only
-        #     11% are infected.
-        G.PPV = G.TP / (G.TP + G.FP)
-        
-        # FPPercent. The percentage of all positives that are false.
-        G.FPPercent =  1 - G.PPV
-                
-        # NPV: Negative Predictive Value
-        #  The probability that a testee is infected & tested negative.
-        G.NPV = G.TN / (G.TN + G.FN)
-        
-        # FPPercent. The percentage of all negatives that are false.
-        G.FNPercent =  1 - G.NPV
-            
-        # ACC: The 'General' Accuracy: = ((TP + TN)) / Pop
-        G.Acc = (G.TP + G.TN) / G.PopSize
-        
-        # Add the stats for the Population Prevalence we have just processed
-        # to our results table, DataTable if required.
-        newrow = {'Prevalence' : PrevCurrent,
-                  'TP'         : G.TP,
-                  'FP'         : G.FP,
-                  'TN'         : G.TN,
-                  'FN'         : G.FN,
-                  'ACC'        : G.Acc,
-                  'Sens'       : G.Sens,
-                  'Spec'       : G.Spec,
-                  'PPV'        : G.PPV,
-                  'FPPercent'  : G.FPPercent,
-                  'NPV'        : G.NPV,
-                  'FNPercent'  : G.FNPercent,
-                  'PrevInt'    : G.PrevInt,
-                  'Population' : G.PopSize
-                  }
-        
-        
-        # Make a note of the statistics at the prevalence of interest.
-        
-        # If we are generating the record for the prevalence of interest
-        # save the stats for the prevalence of interest for the report.
-        if (PrevCurrent >= G.PrevInt) and (G.PrevInt_FPPercent == None ):
-            # We are at or near the prevalence of interest.
-            G.PrevInt_FPPercent = G.FPPercent # Save the FP percentage.
-            G.PrevInt_FNPercent = G.FNPercent   
-            G.PrevInt_PPV = G.PPV
-            G.PrevInt_NPV = G.NPV
-    
-        
-        G.DataTable = G.DataTable.append(newrow, ignore_index=True)
-    # End of 'For each PrevCurrent'
-    return # End of function: User_Input_Process
 
 def GUI_Build_Vertical_Menu():        # Build the GUI.
     # - Our GUI is a streamlit web page with widgets in a vertical toolbar 
@@ -595,9 +488,10 @@ def GUI_Build_Vertical_Menu():        # Build the GUI.
             step=1,
             format="%i",
             help="""Enter the population.[100,1000].   
-            Population does not effect the results which are all percentages 
-            of population.   
-            Changing Population changes only the number of data points.""",
+            Population does not effect the relative accuract results 
+            which are all percentages of population. Changing Population 
+            changes only the number of data points and the absolute numbers
+            .""",
             on_change=None,
             args=None,
             kwargs=None,
@@ -619,9 +513,19 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     Plot_Build()    
         
     # Display a Plot Report box on the GUI.
-    st.info(Plot_Report_Build(formatfor="streamlit"))  
+    st.text(Plot_Report_Build(formatfor="regular"))  
     
-    # Place the Plotly plot on the GUI.
+    # Add button to download the report.  
+    st.download_button(
+        label="👇 Download The Report", 
+        data=Plot_Report_Build(formatfor="regular"), 
+        file_name=G.Report_Download_FileName, 
+        mime= "text/txt",
+        key="ReportDownloadButton", 
+        help="Download the report.") 
+    
+    
+    # Place  Figure 1 on the GUI.
     # - Don't set height or width on the plot or anywhere else. 
     # - Use 'use_container_width' to letStreamlit and Plotly scale everything. 
     #   Otherwise the GUI won't adjust properly to  different size screens.
@@ -630,30 +534,40 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
                     config={'displayModeBar': True}, # Force plotly toolbar.
                     sharing="streamlit")
     
-    ###########################################################################
-    # SHOW BUTTER DOWNLOAD THE PLOT AS AN INDEPENDENT INTERACTIVE HTML PAGE 
 
+    # Add button to download Fig1 as an independent interactive hmtl page.  
     PlotAsInteractiveHTML=plotly.io.to_html(G.Fig1)
     st.download_button(
         label="👇 Download Interactive Plot", 
         data=PlotAsInteractiveHTML, 
-        file_name="activeplot2.html", 
+        file_name=G.Fig1_Download_FileName, 
         mime= "text/html",
-        key="InteractivePlot", 
-        help="Download the plot as an independent interact html page.", 
-        on_click=None, 
-        args=None,
-        kwargs=None, 
-        disabled=False)
+        key="Fig1DownloadPlot", 
+        help="Download the plot as an independent interact html page.") 
     
+    # Place  Figure 2 on the GUI.
+    st.plotly_chart(G.Fig2, 
+                    use_container_width=True, 
+                    config={'displayModeBar': True}, # Force plotly toolbar.
+                    sharing="streamlit")
+
+    # Add button to download Fig2 as an independent interactive hmtl page.
+    PlotAsInteractiveHTML=plotly.io.to_html(G.Fig2)
+    st.download_button(
+        label="👇 Download Interactive Plot", 
+        data=PlotAsInteractiveHTML, 
+        file_name=G.Fig2_Download_FileName, 
+        mime= "text/html",
+        key="Fig2DownloadPlot", 
+        help="Download the plot as an independent interact html page.") 
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
     
     # Pretty up the dataframe. We don't really need much styling in this
-    # program but I put this in as a placeholder.
+    # program but I put this comment in as a placeholder.
     # Some features only work in pandas 1.4 which is still too buggy.
-    #   But they will be great when the new version is stable.
+    # But they will be great when the new version is stable.
          # .hide_columns(["TP","TN"])\
              
     # Highlight the row with prevalence of interest.         
@@ -694,7 +608,6 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     st.dataframe(data=StylerA, width=None, height=None)
 
-
     ###########################################################################
     #  +++ ADD  "DOWNLOAD DATAFRAME" BUTTONS. (CSV or EXCEL options).
     # - The dataframe is converted to a csv file.
@@ -708,7 +621,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     with col1:     
         st.download_button(label="👇 Download The DataFrame To A CSV File", 
                            data=DataFrame_CSV, 
-                           file_name=G.Link40, 
+                           file_name=G.DataTable_Download_FileName_CSV, 
                            mime= "text/csv",
                            key="DownloadCSV_Button", 
                            help=helpstr, 
@@ -725,7 +638,7 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
             data=DataFrameAsExcel ,
             help="In an Excel file any cell highlighting or other "
                  "styling will be preserved.",  
-            file_name= "df_CSV_To_Excel.xlsx")   
+            file_name= G.DataTable_Download_FileName_xcl)   
     
    
     # data = [(1, 2, 3)]
@@ -809,6 +722,125 @@ def GUI_HelpMenu_Build():
                       )
     return()  # End of function: GUI_HelpMenu_Build
 
+def Plot_Generate_Data():
+    # Build table of statistics for the specified range of prevalences.
+    # For the specified range of prevalences (Eg Prevs from 0% to 100%) build
+    # a table with a row for each prevalence in the range and that
+    # prevalences' statistics.
+
+    # Create a list of population disease prevalences percentages
+    # over which  we  want to test the efficacy of the screening test.
+    G.PrevList.clear()   #  Instantiate the list of prevalences.
+    
+    # Avoid zero divide by altering a zero prevalence to a near zero number.
+    if G.PrevStart == 0:
+        G.PrevStart = 0.00000000000000000001
+        
+    # The increment controls the number of data points on the x axis.    
+    prev_increment = (G.PrevEnd - G.PrevStart) / 100
+    i = 0
+    G.PrevList.append(G.PrevStart)
+    while G.PrevList[i] < G.PrevEnd:
+        G.PrevList.append(G.PrevList[i] + prev_increment )
+        i = i + 1
+
+    # Process each of the Prev's in the list of Prev's to be tested.
+    # The stats for each prev are calculated and stored in a table row.
+    G.DataTable = G.DataTable[0:0] # Clear the DataTable. Retain its structure.
+    
+    # We will make a note of the false positive and negative rates at the
+    # users prevalence of interest.
+    G.PrevInt_FPPercent = None
+    G.PrevInt_FNPercent = None
+    G.PrevInt_PPV = None
+    G.PrevInt_NPV = None
+    
+    # Add rows to the DataTable. 
+    # We add one row for each prevalance in the range of prevalances.
+    for PrevCurrent in G.PrevList:  
+        # TP  True Positive:  The test is positive & testee is infected.
+        # TP = PopulationSize * PopulationPrevalence * Sens.
+        G.TP = G.PopSize * PrevCurrent * G.Sens
+    
+        # FP  False Positive:  Test is positive & testee is NOT infected.
+        # FP = PopulationSize * (1 - PopulationPrevalence) * (1 - Spec)
+        G.FP =   G.PopSize * (1 - PrevCurrent) * (1 - G.Spec)
+    
+        # TN  True Negative: Test is negative & testee is NOT infected.
+        # TN = PopulationSize * (1- PopulationPrevalence) * Spec
+        G.TN = G.PopSize * (1 - PrevCurrent) * G.Spec
+    
+        # FN  False Negative: The test is negative & testee IS infected.
+        # FN = PopulationSize * PopulationPrevalence * (1 - Sens)
+        G.FN = G.PopSize * PrevCurrent * (1 - G.Sens)
+    
+        # Sens: Sens aka TPR / (True Positive Rate)
+        # The proportion of test positives that are correct.
+        # (When the test is positive & person IS infected).
+        G.Sens = G.TP / (G.TP + G.FN)
+    
+        # Spec: Spec aka TNR (True Negative Rate)
+        # The proportion of test negatives that are correct.
+        # (When the test is negative & person is not infected).
+        G.Spec = G.TN / (G.TN + G.FP)
+    
+        # PPV: Positive Predictive Value
+        # The probability that a testee is infected given & tested positive.
+        # Eg: A PPV = 11% means that of those who test positive only
+        #     11% are infected.
+        G.PPV = G.TP / (G.TP + G.FP)
+        
+        # FPPercent. The percentage of all positives that are false.
+        G.FPPercent =  1 - G.PPV
+                
+        # NPV: Negative Predictive Value
+        #  The probability that a testee is infected & tested negative.
+        G.NPV = G.TN / (G.TN + G.FN)
+        
+        # FPPercent. The percentage of all negatives that are false.
+        G.FNPercent =  1 - G.NPV
+            
+        # ACC: The 'General' Accuracy: = ((TP + TN)) / Pop
+        G.Acc = (G.TP + G.TN) / G.PopSize
+        
+        # Add the stats for the Population Prevalence we have just processed
+        # to our results table, DataTable if required.
+        newrow = {'Prevalence' : PrevCurrent,
+                  'TP'         : G.TP,
+                  'FP'         : G.FP,
+                  'TN'         : G.TN,
+                  'FN'         : G.FN,
+                  'ACC'        : G.Acc,
+                  'Sens'       : G.Sens,
+                  'Spec'       : G.Spec,
+                  'PPV'        : G.PPV,
+                  'FPPercent'  : G.FPPercent,
+                  'NPV'        : G.NPV,
+                  'FNPercent'  : G.FNPercent,
+                  'PrevInt'    : G.PrevInt,
+                  'Population' : G.PopSize
+                  }
+        
+        
+        # Make a note of the statistics at the prevalence of interest.
+        
+        # If we are generating the record for the prevalence of interest
+        # save the stats for the prevalence of interest for the report.
+        if (PrevCurrent >= G.PrevInt) and (G.PrevInt_FPPercent == None ):
+            # We are at or near the prevalence of interest.
+            G.PrevInt_FPPercent = G.FPPercent # Save the FP percentage.
+            G.PrevInt_FNPercent = G.FNPercent   
+            G.PrevInt_PPV = G.PPV
+            G.PrevInt_NPV = G.NPV
+            G.PrevInt_TP= G.TP
+            G.PrevInt_FP= G.FP
+            G.PrevInt_TN= G.TN
+            G.PrevInt_FN= G.FN        
+        
+        G.DataTable = G.DataTable.append(newrow, ignore_index=True)
+    # End of 'For each PrevCurrent'
+    return # End of function: Plot_Generate_Data
+
 def Plot_Build(): # Create our plot using Plotly Graph Objects.
     # Plotly graph objects (GO) are for building plots "by hand".
     # GO graphing gives more control than graphing with Plotly Express.
@@ -834,7 +866,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
         mode="lines",
         xhoverformat= x_hoverformat,
         yhoverformat= y_hoverformat,
-        line=dict(color="red")  )) 
+        line=dict(color="red")      )) 
    
     G.Fig1.add_trace(go.Scatter(
         name="False Negative Percentage",
@@ -868,27 +900,6 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
         xhoverformat= x_hoverformat,
         yhoverformat= y_hoverformat,
         line=dict(color="magenta")  ))
-     
-    G.Fig1.add_trace(go.Scatter(
-        name="False Positive",
-        text="False Positive",
-        legendrank=6,
-        x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
-        visible="legendonly",
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="black")  ))
-
-    G.Fig1.add_trace(go.Scatter(
-        name="False Negative",
-        text="False Negative",
-        legendrank=8,
-        x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
-        visible="legendonly",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="peru" ) ))
     
     G.Fig1.add_trace(go.Scatter(
         name="General Accuracy",
@@ -901,17 +912,12 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
         yhoverformat= y_hoverformat,
         line=dict(color="orange")  ))
     
-
-    # We don't really need a vertical line at the prevalence of interest
-    # because the plotly hover text does a better and dynamic job
-    # of highlighting values of any statistic at any prevalence. 
-    # Add a vertical line at the prevalence of interest.
-    # G.Fig1.add_vline(x=G.PrevInt,line_dash="dash", line_color="red") 
-    
     # Adjust titles, grid, font etc.
-    G.Fig1.update_layout(title="<b>Screening Test Statistics",title_x=0.4)
-    G.Fig1.update_layout(xaxis_title="<b>Disease Prevalence In Population")
-    G.Fig1.update_layout(yaxis_title="<b>Response Of The Screening Test")
+    G.Fig1.update_layout(
+        title="<b>Screening Test: Accuracy Percentages",
+        title_x=0.4,
+        xaxis_title="<b>Disease Prevalence In Population",
+        yaxis_title="<b>Response Of The Screening Test")
     G.Fig1.update_xaxes(showgrid=True,gridcolor="lightgray")
     G.Fig1.update_yaxes(showgrid=True,gridcolor="lightgray")
     # We MUST let the plot autosize so that it will best fit different
@@ -977,16 +983,74 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
     #  document box under the plot. (See width/height above.)
     #  But if we don't autosize the plot it won't adjust to different size
     #  screens. So we avoid any feature that sets absolute size for anything.
-    
     # G.Fig1.add_annotation(
-    #     text="report here", 
+    #     text=Plot_Report_Build(formatfor="regular"), 
     #         align="left",
     #         showarrow=False,
     #         xref="paper", yref="paper",
-    #         x= 0.40, xanchor = "left",
-    #         y=-0.25, yanchor = "bottom",
+    #         x= 0.90, xanchor = "left",
+    #         # y=-0.25, yanchor = "bottom",
     #         bordercolor="black", borderwidth=0)
         
+    
+    
+    ###########################################################################
+    #  CREATE FIGURE 2:  THE ABSOLUTE NUMBER OF POSITIVES AND NEGATIVES
+    ###########################################################################
+         
+    G.Fig2 = go.Figure() # Create an empty Plotly figure.
+    
+    G.Fig2.add_trace(go.Scatter(
+        name="True Positive",
+        text="True Positive",
+        legendrank=6,
+        x=G.DataTable["Prevalence"], y=G.DataTable["TP"], 
+        visible=True,
+        mode="lines",
+        xhoverformat= x_hoverformat,
+        yhoverformat= y_hoverformat,
+        line=dict(color="black")  ))
+    
+    G.Fig2.add_trace(go.Scatter(
+        name="False Positive",
+        text="False Positive",
+        legendrank=6,
+        x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
+        visible="legendonly",
+        mode="lines",
+        xhoverformat= x_hoverformat,
+        yhoverformat= y_hoverformat,
+        line=dict(color="black")  ))
+
+    G.Fig2.add_trace(go.Scatter(
+        name="True Negative",
+        text="True Negative",
+        legendrank=8,
+        x=G.DataTable["Prevalence"], y=G.DataTable["TN"], 
+        visible=True,
+        xhoverformat= x_hoverformat,
+        yhoverformat= y_hoverformat,
+        line=dict(color="peru" ) ))    
+
+    G.Fig2.add_trace(go.Scatter(
+        name="False Negative",
+        text="False Negative",
+        legendrank=8,
+        x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
+        visible="legendonly",
+        xhoverformat= x_hoverformat,
+        yhoverformat= y_hoverformat,
+        line=dict(color="peru" ) ))
+    
+    G.Fig2.update_layout(
+        title="<b>Screening Test:   Claimed Absolute Numbers.",
+        title_x=0.4,
+        xaxis_title="<b>Disease Prevalence In Population",
+        yaxis_title="<b>Claimed Absolute Number Of Response Variable")
+    
+    G.Fig2.update_layout(xaxis = dict(tickmode = 'linear',
+                         tick0 = G.PrevStart, dtick = XtickIncrement))
+  
     return() # End of function:   Plot_Build()
 
 def Plot_Report_Build(formatfor="regular"):
@@ -995,48 +1059,56 @@ def Plot_Report_Build(formatfor="regular"):
         ind = " _ " 
         eol =   ".  \r"  # ". \u000D"
     else: 
-        ind = " - " 
+        ind = " - "
+        eol = "  \n"
         
     header = "**👍 REPORT ON YOUR SCREENING TEST** "
-    if G.UsersReportTitle == None \
-       or G.UsersReportTitle == ""  \
-       or G.UsersReportTitle.isspace():
-       G.UsersReportTitle = header    
+    if G.UsersReportAnnotation == None \
+       or G.UsersReportAnnotation == ""  \
+       or G.UsersReportAnnotation.isspace():
+       pass    
     else:
-        G.UsersReportTitle=G.UsersReportTitle.replace(". ",eol) 
-        G.UsersReportTitle = header + "  \r" + G.UsersReportTitle 
+        # User has supploed a report annotation. Edit it to create new line
+        # after each period.
+        G.UsersReportAnnotation=G.UsersReportAnnotation.replace(". ",eol) 
+        header = header + "  \n" + G.UsersReportAnnotation 
                      
     G.Plot_Report = str(
-       G.UsersReportTitle  + "  \n"                                    +
-       ind + "In this test the disease prevalence varies "             +
-             f" from {G.PrevStart:.5f} to {G.PrevEnd:.5f} .   \n"      +
-       ind + f"Test Sensitivity = {G.Sens:.4f}.   \n"                  +
-       ind + f"Test Specificity = {G.Spec:.4f}.   \n"                  +
-       ind + f"The Prevalence Of Interest = {G.PrevInt:.6f}.  \n"      + 
-       ind + f"About {G.PrevInt_FPPercent:.2f} "                       + 
-             "of all positives are false at a prevalence of "          +
-             f"{G.PrevInt:.6f}  \n"                                    +
-       ind + f"About {G.PrevInt_FNPercent:.2f} "                       + 
-             "of all negatives are false at a prevalence of "          +
-             f"{G.PrevInt:.6f}.  \n"                                   +      
+       
+       header  + "  \n   \n"                                                 +
+       ind + "In this simulation the disease prevalence varies "             +
+             f"from {G.PrevStart:.5f} to {G.PrevEnd:.5f}.   \n"              +
+       ind + f"Test Sensitivity = {G.Sens:.4f}.   \n"                        +
+       ind + f"Test Specificity = {G.Spec:.4f}.   \n"                        +
+       ind + f"Plot Prevalence Start = {G.PrevStart:.5f}.   \n"              +
+       ind + f"Plot Prevalence End = {G.PrevEnd:.5f}.   \n"                  +
+       ind + f"Population = {G.PopSize:.0f}.   \n"                           +
+             "       \n"                                                     +
+             f"** At The Prevalence Of Interest = {G.PrevInt:.6f}.**   \n"   + 
+       ind + f"About {G.PrevInt_FPPercent:.2f} "                             +
+              "of all positives are false. \n"                               + 
+       ind + f"About {G.PrevInt_FNPercent:.2f} "                             + 
+              "of all negatives are false.  \n"                              +      
        ind + f"Positive Predictive Value (PPV) = {G.PrevInt_PPV :.4f}.   \n" +
        ind + f"Negative Predictive Value (NPV) = {G.PrevInt_NPV :.4f}.   \n" +
-       ind + f"Plot Prevalence Start = {G.PrevStart:.5f}.   \n"         +
-       ind + f"Plot Prevalence End = {G.PrevEnd:.5f}.   \n"             +
-       ind + f"Population = {G.PopSize:,}.   \n"
+       ind + f"Claimed True Positives = {G.PrevInt_TP:.2f}.    \n"           +
+       ind + f"Claimed False Positives = {G.PrevInt_FP:.2f}.   \n"           +
+       ind + f"Claimed True Negatives = {G.PrevInt_TN:.2f}.    \n"           +
+       ind + f"Claimed False Negatives = {G.PrevInt_FN:.2f}.   \n"                             
                        ) 
     return(G.Plot_Report)   #  End of function: Plot_Report_Build
 
+
+
+
 def Plot_Streamlit_FullScreenIcon_Format():
     # This function increases the visibility of the Streamlit
-    # full page icon. It injects css code using markdown.
+    # 'full page' icon. It injects css code using markdown.
     css = """
          button[title="View fullscreen"] 
          {background-color: #004170cc; left: 2; color: white; }
-    
          button[title="View fullscreen"]:hover 
          {background-color: #004170; color: white; } """
-    
     st.markdown( "<style>" + css + "</styles>", unsafe_allow_html=True)
     return() # End of function: Plot_Streamlit_FullScreenIcon_Format
     
