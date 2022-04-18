@@ -82,7 +82,7 @@ class Global_Variables():  # A class creating all global variables.
     # Link to this programs source code
     Link06 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/screeningtest.py"
     # App documentation video.
-    Link20 = "https://youtu.be/DkpuAnnDjyo"
+    Link20 = "https://youtu.be/EuKDZNXmOU8"
     
     # Filenames.
     DataTable_Download_FileName_xcl = "ScreeningTestDataFrame.xlsx"
