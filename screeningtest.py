@@ -693,13 +693,15 @@ def GUI_HelpMenu_Build():
             + "  \rContacts:  "         + G.ThisModule_Contact
             + "  \rProgram Version:  "  + G.ThisModule_Version 
             + "  \rProgram Documentation: " 
-                    +  f" [ Link To Program Documentation.]({G.Link01})"  
+                 +  f" [Link ➡️]({G.Link01})"  
             + "  \rProgram Source Code:    "  
-                            +  f" [ Link To Program Source Code]({G.Link06})"         
-            + "  \rProject Files:    "  
-                    +  f" [ Link To All Of The Projects Files.]({G.Link02})"  
+                 +  f" [Link➡️]({G.Link06})"    
+            + "  \rVideo Introducing the Program:    "  
+                 +  f" [Link➡️]({G.Link20})"                  
+            + "  \rAll Project Files:    "  
+                 +  f" [Link➡️]({G.Link02})"     
             + "  \rReport A Bug:    "  
-                   +  f" [ Link To Report A Bug.]({G.Link04})"  
+                 +  f" [Link➡️]({G.Link04})"  
                }
                       )
     return()  # End of function: GUI_HelpMenu_Build
@@ -1088,7 +1090,7 @@ def Plot_Report_Build(formatfor="regular"):
     else:
         # User has supplied a report annotation. Edit it to create new line
         # after each period.
-        G.UsersReportAnnotation=G.UsersReportAnnotation.replace(". ",".  \u000D") 
+        G.UsersReportAnnotation=G.UsersReportAnnotation.replace(". ",".  \r") 
         header = header + "  \n" + G.UsersReportAnnotation 
                     
     G.Plot_Report = str(
