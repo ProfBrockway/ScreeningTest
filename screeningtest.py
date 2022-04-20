@@ -83,7 +83,8 @@ class Global_Variables():  # A class creating all global variables.
     Link06 = "https://github.com/ProfBrockway/ScreeningTest/blob/main/screeningtest.py"
     # App documentation video.
     Link20 = "https://youtu.be/EuKDZNXmOU8"
-    
+    # Program discussion page at Github
+    Link22 = "https://github.com/ProfBrockway/ScreeningTest/discussions"
     # Filenames.
     DataTable_Download_FileName_xcl = "ScreeningTestDataFrame.xlsx"
     DataTable_Download_FileName_CSV = "ScreeningTestDataFrame.csv"
@@ -699,7 +700,9 @@ def GUI_HelpMenu_Build():
             + "  \rVideo Introducing the Program:    "  
                  +  f" [Link➡️]({G.Link20})"                  
             + "  \rAll Project Files:    "  
-                 +  f" [Link➡️]({G.Link02})"     
+                 +  f" [Link➡️]({G.Link02})"  
+            + "  \rDiscussion Page For This Program:    "  
+                      +  f" [Link➡️]({G.Link22})"        
             + "  \rReport A Bug:    "  
                  +  f" [Link➡️]({G.Link04})"  
                }
