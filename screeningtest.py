@@ -1,16 +1,5 @@
-
-#TO DO
-
-#  - We report (e.g.) the claimed absolute numbers of true positives. 
-#       Add an 'adjusted' for prevalence actual true positives to the report.
-# 
-# For final submission.
-# - spell check comments to get rid of gross errors.
-# - check results carefully against another calculator.
-
-
 ##############################################################################
-#                           ScreeningTest
+#                  Medical ScreeningTest Modeling Program
 ##############################################################################
 # Course: CCSU Stat 476.  Spring 2022.
 # Author: Tim Brockway. Student ID: 30259316   Email: BrockwayTim@My.CCSU.edu
@@ -474,7 +463,7 @@ def GUI_Build_Vertical_Menu():        # Build the GUI.
         # Input the prevalence of interest to be highlighted on the plot
         st.number_input(
             key="PrevInt",    # Value will be placed in S.PrevInt'].
-            value=0.03,
+            value=0.01,
             label="Prevalence Of Interest",
             min_value=0.00,
             max_value=1.00,
