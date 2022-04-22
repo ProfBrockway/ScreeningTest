@@ -650,17 +650,17 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
   
     with st.expander("📽 **A WEBSITE CHARTING PREVALENCE OF COVID 19**"):
         st.info(
-         "Please see this program's documentation for a discussion on "
+         "Please see this program's documentation for a discussion of "
          "prevalence.  \r" 
          "The McKinsey website below claims to report the prevalence of Covid " 
-         "19 in the USA for the past elapsed year.  \r"
+         "19 in the USA for the past elapsed year.  "
          "https://covid-tracker.mckinsey.com/prevalence  \r"
          "Prevalence is reported as less than 1% for 10.5 months!   \r"
          "As of 4/13/2022 prevalence is reported at 0.14%.   \r"
-         "'Prevalence' is defined as Case prevalence measures the number "
+         "'Prevalence' is defined as 'Case prevalence measures the number "
          "of active COVID-19 cases in a state as a percentage of the "
          "state's population. A COVID-19 case is counted as active "
-         "during the 14 days after it is confirmed.  \r"
+         "during the 14 days after it is confirmed.'  \r"
          "The McKinsey website is also embedded in this web page below.  \r" 
                ) 
         # Show an embedded web site. 
