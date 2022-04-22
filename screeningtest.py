@@ -1,12 +1,11 @@
 
 #TO DO
-# search ?V
-#  - We report (e.g.) the claimed absolute numbers of true positives. Add an 'adjusted' for prevalence actual true positives to the report.
-#  - Create documentation including a documentation video and deploy it
+
+#  - We report (e.g.) the claimed absolute numbers of true positives. 
+#       Add an 'adjusted' for prevalence actual true positives to the report.
 # 
 # For final submission.
-# - Do hand calculations for verification.
-#  - spell check comments to get rid of gross errors.
+# - spell check comments to get rid of gross errors.
 # - check results carefully against another calculator.
 
 
@@ -44,13 +43,13 @@ from streamlit import session_state as S
 import pandas as pd
 
 # Sundry imports. Some may be flagged as unused, but import them anyway.
-import matplotlib as mpl    # We may use both matplotlib and plotly
+
 import plotly
-import plotly.express as px 
+#import plotly.express as px 
 import plotly.graph_objects as go
 
 from io import BytesIO
-from pyxlsb import open_workbook as open_xlsb
+
 
 class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
@@ -245,7 +244,7 @@ def MainLine():
     ConsoleClear()  # Clear the internal IPython console.
 
     # If this the initial session then create "Static/Persistent" variables.
-    if 'Dialog_State' not in S:
+    if "Dialog_State" not in S:
         Initialization_Perform_First_Load_Only() # Create Dialog_State etc.
         S.Dialog_State  = 1  # Upgrade state so we don't come back here.
 
@@ -258,14 +257,15 @@ def MainLine():
             # Build a table for the efficacies of the screening test across
             # the range of disease prevalences specified by the user.
             Plot_Generate_Data()
-            # Plot the table of efficacies of the screening test.
+            # Show the plots and output built from the users input.
             GUI_Right_Panel_Build()
             
-        # NOT the first invocation.    
-        else:  # There is an error in the users input. 
+        # There is an error in the users input.    
+        else:   
            st.error(G.Msg_Current) # Show the error in the right panel.
+    # End of  if "Dialog_State" not in S
+    
 
-    # Display the results and wait for next user input.
     GUI_Build_Vertical_Menu()
     return()  # End of function: MainLine.
 
@@ -299,6 +299,7 @@ def Initialization_Perform_First_Load_Only():
     # Static variables are static, persistant and global.  
     Static_Variables_Create() 
        
+    # Set the "Please enter your input" message.
     S.MsgText = G.Msg01
     return()  # End of function: Initialization_Perform_First_Load_Only
 
@@ -516,6 +517,7 @@ def GUI_Build_Vertical_Menu():        # Build the GUI.
             disabled=False)
         # End of "With Form"
     
+
  
     return()  # End of function: GUI_Build_Vertical_Menu
 
@@ -526,12 +528,16 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     # Increase the visibility of the Streamlit "full page" icon.
     Plot_Streamlit_FullScreenIcon_Format()
-     
+    
+    # Place a header on the right panel.
+    st.header("Medical Screening Test Model")
+    
     # Build the plot using Plotly graph objects (GO)(not plotly express).
     Plot_Build()    
     
+ 
     # Place a report of the results of the simulation on the GUI
-    with st.expander("👍 ** REPORT ON YOUR SCREENING TEST**"):
+    with st.expander("✍ **REPORT ON YOUR SCREENING TEST**"): #📝
         # Display a Plot Report box on the GUI.
         st.info(Plot_Report_Build(formatfor="streamlit"))  
         
@@ -544,41 +550,27 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
             key="ReportDownloadButton", 
             help="Download the report.") 
     
+    with st.expander("📈 ** PLOTS OF YOUR SCREENING TEST**"):
+        # Place  Figure 1 on the GUI.
+        # - Don't set height or width on the plot or anywhere else. 
+        # - Use 'use_container_width' to letStreamlit and Plotly scale everything. 
+        #   Otherwise the GUI won't adjust properly to  different size screens.
+        st.plotly_chart(G.Fig1, 
+                        use_container_width=True, 
+                        config={'displayModeBar': True}, # Force plotly toolbar.
+                        sharing="streamlit")
+        
+        # Add button to download Fig1 as an independent interactive hmtl page.  
+        PlotAsInteractiveHTML=plotly.io.to_html(G.Fig1)
+        st.download_button(
+            label="👇 Download Interactive Plot", 
+            data=PlotAsInteractiveHTML, 
+            file_name=G.Fig1_Download_FileName, 
+            mime= "text/html",
+            key="Fig1DownloadPlot", 
+            help="Download the plot as an independent interact html page.") 
     
-    # Place  Figure 1 on the GUI.
-    # - Don't set height or width on the plot or anywhere else. 
-    # - Use 'use_container_width' to letStreamlit and Plotly scale everything. 
-    #   Otherwise the GUI won't adjust properly to  different size screens.
-    st.plotly_chart(G.Fig1, 
-                    use_container_width=True, 
-                    config={'displayModeBar': True}, # Force plotly toolbar.
-                    sharing="streamlit")
-    
-    # Add button to download Fig1 as an independent interactive hmtl page.  
-    PlotAsInteractiveHTML=plotly.io.to_html(G.Fig1)
-    st.download_button(
-        label="👇 Download Interactive Plot", 
-        data=PlotAsInteractiveHTML, 
-        file_name=G.Fig1_Download_FileName, 
-        mime= "text/html",
-        key="Fig1DownloadPlot", 
-        help="Download the plot as an independent interact html page.") 
-    
-    # Place  Figure 2 on the GUI.
-    st.plotly_chart(G.Fig2, 
-                    use_container_width=True, 
-                    config={'displayModeBar': True}, # Force plotly toolbar.
-                    sharing="streamlit")
-
-    # Add button to download Fig2 as an independent interactive hmtl page.
-    PlotAsInteractiveHTML=plotly.io.to_html(G.Fig2)
-    st.download_button(
-        label="👇 Download Interactive Plot", 
-        data=PlotAsInteractiveHTML, 
-        file_name=G.Fig2_Download_FileName, 
-        mime= "text/html",
-        key="Fig2DownloadPlot", 
-        help="Download the plot as an independent interact html page.") 
+ 
     
     ###########################################################################
     # +++ SHOW THE DATATABLE.
@@ -611,47 +603,48 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
      .set_properties(subset=["FNPercent"],**{"background-color":"pink","color":"black"})\
      .apply(DataFrame_Highlight_PrevInt_Row, axis=1)
     
-    with st.expander("🟢 THE DATA TABLE USED FOR THE PLOT FOLLOWS."):
+    with st.expander("📅 **THE DATA TABLE GENERATED FROM YOUR INPUT AND " 
+                     "USED FOR THE PLOT FOLLOWS**"):
         st.info(
                 "The 'Prevalence of interest' row is highlighted.  \r"
-                "You can enlarge the table by clicking the 'View full screen' "
+                "You can enlarge the table by clicking the 'View fullscreen' "
                 " icon.  \r"
-                "'Float' the mouse over the table and the 'View full screen' "
+                "'Float' the mouse over the table and the 'View fullscreen' "
                 "icon will appear.")
     
-    st.dataframe(data=StylerA, width=None, height=None)
+        st.dataframe(data=StylerA, width=None, height=None)
 
-    ###########################################################################
-    #  +++ ADD  "DOWNLOAD DATAFRAME" BUTTONS. (CSV or EXCEL options).
-    # - The dataframe is converted to a csv file.
-    # - That file is downloaded to the browsers download location.
-    # - There is no "save as" menu. The file name is hard coded.
-    
-    DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
-    helpstr = ("The file will be saved in your browser's default download "
-              " location on your computer. ")
-    col1, col2 = st.columns(2)
-    with col1:     
-        st.download_button(label="👇 Download The DataFrame To A CSV File", 
-                           data=DataFrame_CSV, 
-                           file_name=G.DataTable_Download_FileName_CSV, 
-                           mime= "text/csv",
-                           key="DownloadCSV_Button", 
-                           help=helpstr, 
-                           on_click=None, 
-                           args=None,
-                           kwargs=None, 
-                           disabled=False)
+        #######################################################################
+        #  +++ ADD  "DOWNLOAD DATAFRAME" BUTTONS. (CSV or EXCEL options).
+        # - The dataframe is converted to a csv file.
+        # - That file is downloaded to the browsers download location.
+        # - There is no "save as" menu. The file name is hard coded.
         
-    with col2:    
-        # NOTE !! If we use a styler on the grid we can pass that instead
-        #         of the dataframe and preserve all stylings in the excel file.
-        DataFrameAsExcel = DataFrame_Convert_To_Excel(StylerA)
-        st.download_button(label="👇 Download DataFrame To An Excel File",
-            data=DataFrameAsExcel ,
-            help="In an Excel file any cell highlighting or other "
-                 "styling will be preserved.",  
-            file_name= G.DataTable_Download_FileName_xcl)   
+        DataFrame_CSV = G.DataTable.to_csv().encode('utf-8')
+        helpstr = ("The file will be saved in your browser's default download "
+                  " location on your computer. ")
+        col1, col2 = st.columns(2)
+        with col1:     
+            st.download_button(label="👇 Download The DataFrame To A CSV File", 
+                               data=DataFrame_CSV, 
+                               file_name=G.DataTable_Download_FileName_CSV, 
+                               mime= "text/csv",
+                               key="DownloadCSV_Button", 
+                               help=helpstr, 
+                               on_click=None, 
+                               args=None,
+                               kwargs=None, 
+                               disabled=False)
+            
+        with col2:    
+            # NOTE !! If we use a styler on the grid we can pass that instead
+            #         of the dataframe and preserve all stylings in the excel file.
+            DataFrameAsExcel = DataFrame_Convert_To_Excel(StylerA)
+            st.download_button(label="👇 Download DataFrame To An Excel File",
+                data=DataFrameAsExcel ,
+                help="In an Excel file any cell highlighting or other "
+                     "styling will be preserved.",  
+                file_name= G.DataTable_Download_FileName_xcl)   
     
         
     ###########################################################################
@@ -659,9 +652,39 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     #  Github basing of videos does not allow raw address of large files.
     #  Google basing of videos  does not work because it downloads too slowly.
     #  So until I can figure out how to base videos at github we use Youtube.
-    st.info("🎬  A VIDEO DEMONSTRATING THIS PROGRAM'S FEATURES.")   
-    st.video(G.Link20)
+    with st.expander("📽 **A VIDEO DEMONSTRATING THIS PROGRAM'S FEATURES**"):
+        st.video(G.Link20)
+    
+    
+    ###########################################################################
+    # +++ SHOW A WEB SITE WHERE COVID PREVALENCE IS CHARTED.
+  
+    with st.expander("📽 **A WEBSITE CHARTING PREVALENCE OF COVID 19**"):
+        st.info(
+         "Please see this program's documentation for a discussion on "
+         "prevalence.  \r" 
+         "The McKinsey website below claims to report the prevalence of Covid " 
+         "19 in the USA for the past elapsed year.  \r"
+         "https://covid-tracker.mckinsey.com/prevalence  \r"
+         "Prevalence is reported as less than 1% for 10.5 months!   \r"
+         "As of 4/13/2022 prevalence is reported at 0.14%.   \r"
+         "'Prevalence' is defined as Case prevalence measures the number "
+         "of active COVID-19 cases in a state as a percentage of the "
+         "state's population. A COVID-19 case is counted as active "
+         "during the 14 days after it is confirmed.  \r"
+         "The McKinsey website is also embedded in this web page below.  \r" 
+               ) 
+        # Show an embedded web site. 
+        st.write("""<iframe 
+                 src="https://covid-tracker.mckinsey.com/prevalence" 
+                 width="1000" height="600" allowfullscreen=""
+                    >
+               </iframe>""",
+               unsafe_allow_html=True)
+    
+    
    
+    
     return  # End of function: GUI_Right_Panel_Build
 
 def GUI_HelpMenu_Build():
@@ -844,10 +867,10 @@ def Plot_Generate_Data():
     return # End of function: Plot_Generate_Data
 
 def Plot_Build(): # Create our plot using Plotly Graph Objects.
+    
     # Plotly graph objects (GO) are for building plots "by hand".
-    # GO graphing gives more control than graphing with Plotly Express.
-    x_hoverformat = ".4f"
-    y_hoverformat = ".4f"
+    # GO graphing gives more control than graphing with Plotly "Express".
+    
     
     # Create a graph of Prevalence (x axis) vs various statistics.
     # We build a line plot with multiple graph lines.
@@ -860,114 +883,143 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
     # We add the lines(aka traces) to the plot that the user has requested.
      
     G.Fig1.add_trace(go.Scatter(
-        name="False Positive Percentage", # Shows in Legend.
-        text="False Positive Percentage", # Shows in Hovertext.
-        legendrank=1, # Where the line will appear in the legend list.
-        x=G.DataTable["Prevalence"], y=G.DataTable["FPPercent"], 
-        visible=True,
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="red")      )) 
-   
-    G.Fig1.add_trace(go.Scatter(
-        name="False Negative Percentage",
-        text="False Negative Percentage",
-        legendrank=2,
-        x=G.DataTable["Prevalence"], y=G.DataTable["FNPercent"],
-        visible=True,
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="blue")  ))     
+      x=G.DataTable["Prevalence"],
+      y=G.DataTable["FPPercent"], 
+      name="False Positive Percentage", # Shows in Legend.
+      text="False Positive Percentage", # Shows in Hovertext.
+      hovertemplate="<br>" + "Prev=%{x}, " + "False Positive Percentage=%{y}  <extra></extra>",
+      hoverinfo="text",
+      hoverlabel=dict(font_size=12,bgcolor="red"),
+      xhoverformat= ".4f",
+      yhoverformat= ".4f",
+      legendrank=1, # Where the line will appear in the legend list.
+      visible=True,
+      mode="lines",
+      line=dict(color="red")      )) 
 
     G.Fig1.add_trace(go.Scatter(
-        name="Positive Predictive Value",   
-        text="Positive Predictive Value",   
-        legendrank=3,
-        x=G.DataTable["Prevalence"], y=G.DataTable["PPV"], 
-        visible="legendonly",
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="green"  )   ))
-  
+      x=G.DataTable["Prevalence"],
+      y=G.DataTable["PPV"], 
+      name="Positive Predictive Value",   
+      text="Positive Predictive Value",  
+      hovertemplate="<br>" + "Prev=%{x}, " + "Positive Predictive Value=%{y}  <extra></extra>",
+      hoverinfo="name",
+      hoverlabel=dict(font_size=12,bgcolor="green"),
+      xhoverformat= ".4f",
+      yhoverformat= ".4f",
+      legendrank=2,
+      visible=True,
+      mode="lines",
+      line=dict(color="green"  )   ))
+   
     G.Fig1.add_trace(go.Scatter(
-        name="Negative Predictive Values",
-        text="Negative Predictive Values",
-        legendrank=4,
-        x=G.DataTable["Prevalence"], y=G.DataTable["NPV"], 
-        visible="legendonly",
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="magenta")  ))
+      x=G.DataTable["Prevalence"],
+      y=G.DataTable["FNPercent"],
+      name="False Negative Percentage",
+      text="False Negative Percentage",
+      hovertemplate="<br>" + "Prev=%{x}, " + "False Negative Percentage=%{y}  <extra></extra>",
+      hoverinfo="name",
+      hoverlabel=dict(font_size=12,bgcolor="blue"),
+      xhoverformat= ".4f",
+      yhoverformat= ".4f",
+      legendrank=3,
+      visible="legendonly",
+      mode="lines",
+      line=dict(color="blue")  ))     
     
     G.Fig1.add_trace(go.Scatter(
-        name="General Accuracy",
-        text="General Accuracy",
-        legendrank=9,
-        x=G.DataTable["Prevalence"], y=G.DataTable["ACC"],
-        visible="legendonly",
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="orange")  ))
+      x=G.DataTable["Prevalence"],
+      y=G.DataTable["NPV"], 
+      name="Negative Predictive Value",
+      text="Negative Predictive Value",
+      hovertemplate="<br>" + "Prev=%{x}, " + "Negative Predictive Value=%{y} <extra></extra>",
+      hoverinfo="name",
+      hoverlabel=dict(font_size=12,bgcolor="magenta"),
+      xhoverformat= ".4f",
+      yhoverformat= ".4f",
+      legendrank=4,
+      visible="legendonly",
+      mode="lines",
+      line=dict(color="magenta")  ))
+    
+    G.Fig1.add_trace(go.Scatter(
+      x=G.DataTable["Prevalence"],
+      y=G.DataTable["ACC"],
+      name="General Accuracy",
+      text="General Accuracy",
+      hovertemplate="<br>" + "Prev=%{x}, " + "General Accuracy=%{y}  <extra></extra>",
+      hoverinfo="name",
+      hoverlabel=dict(font_size=12,bgcolor="orange"),
+      xhoverformat= ".4f",
+      yhoverformat= ".4f",
+      legendrank=9,
+      visible="legendonly",
+      mode="lines",
+      line=dict(color="orange")  ))
     
     # Adjust titles, grid, font etc.
     PlotTitle = "<b>Screening Test: Accuracy Percentages"
     G.Fig1.update_layout(
-        title=PlotTitle,
-        title_x=0.4,
-        xaxis_title="<b>Disease Prevalence In Population",
-        yaxis_title="<b>Response Of The Screening Test")
-    G.Fig1.update_xaxes(showgrid=True,gridcolor="lightgray")
-    G.Fig1.update_yaxes(showgrid=True,gridcolor="lightgray")
-    # We MUST let the plot autosize so that it will best fit different
-    # size screens. 
-    G.Fig1.update_layout(autosize=True, width=None, height=None) #800*1100
-    G.Fig1.layout.plot_bgcolor = "white"
-    #G.Fig1.layout.margin = dict(t=5, b=5, l=0, r=0)
+      title=PlotTitle,
+      title_x=0.4,
+      xaxis_title="<b>Disease Prevalence In Population",
+      yaxis_title="<b>Response Of The Screening Test",
+      plot_bgcolor = "white",
+      paper_bgcolor="mintcream",
         
-    # Adjust the hover text aka "mouseover" text.
-    # Show hover values for all visible lines (aka traces).
-    G.Fig1.update_layout(hovermode="x") # "x", "x unified" or "closest"
-    # Show vertical and horizontal hover axes intersect lines.
-    G.Fig1.update_xaxes(showspikes=True, spikecolor="green",spikethickness=1, 
-                        spikesnap="cursor", spikemode="across")
-    G.Fig1.update_yaxes(showspikes=True, spikecolor="green", spikethickness=1)
-    # Specify what is shown on each hovertext line.
-    # https://plotly.com/python/hover-text-and-formatting/#advanced-hover-template
-    # HT=("<br>" + "At Prevalence=%{x:.4f},  " + "y=%{y:.4f}") 
-    HT=("<br>" + "Prev=%{x}, " + "y=%{y}") 
-    G.Fig1.update_traces(hovertemplate=HT,hoverlabel=dict())
-    G.Fig1.update_traces(hoverlabel=dict(namelength=50)) #Suppress floating part. 
-    # Adjust the hovertext font.  
-    G.Fig1.update_layout(hoverlabel=dict(font_size=12,bgcolor="palegreen")) 
+      # Add border around the plot. #,ivory,linen,mintcream,snow,whitesmoke
+      margin=dict(l=10, r=10, t=30, b=30), 
+        
+      # We MUST let the plot autosize so that it will best fit different size screens.
+      autosize=True, width=None, height=None,  
+        
+      # Adjust the legend.
+      legend_title_text="<b>Legend.",
+      legend=dict(
+                  # title_font_family="Times New Roman",
+                  font=dict(size=10),
+                  # Make the legend transparent.
+                  bgcolor="rgba(0,0,0,0)", 
+                  bordercolor="Black",
+                  yanchor="middle",y=+0.50,
+                  xanchor="right",x=+1.35,
+                  borderwidth=1) ,
+        
+         # Adjust hover mode for all visible lines (aka traces).
+         hovermode="x", # "x", "x unified" or "closest
+                    )
     
-  
-    # Adjust the legend.
-    G.Fig1.update_layout(legend_title_text="<b>Legend.")
-    G.Fig1.update_layout(
-    legend=dict(
-        # title_font_family="Times New Roman",
-        font=dict(size=10),
-        # Make the legend transparent to minimize its obscuration of the plot.
-        bgcolor="rgba(0,0,0,0)", 
-        bordercolor="Black",
-        borderwidth=1 ))
-    # Place the legend at a desired location on the plot.
-    # The legend will sometimes obscure the plot.
-    # So we place it to the right of the plot.
-    # This reduces and reshapes the plot display itself.
-    # Fortunately the Plotly "full screen" option can be used to view the plot
-    # beautifully.
-    G.Fig1.update_layout(
-      legend={"yanchor":"middle","y":+ 0.50,"xanchor":"right","x":+1.35})
+    G.Fig1.update_xaxes(
+        showgrid=True,
+        gridcolor="lightgray",
+        showline=True, 
+        linecolor='black',
+        mirror=True,
+        # Show  x axis vertical line.
+        showspikes=True, 
+        spikecolor="green",
+        spikethickness=2, 
+        spikedash="solid",
+        spikesnap="cursor",
+        spikemode="across+toaxis"         
+                        )
     
+    G.Fig1.update_yaxes(
+        showgrid=True,
+        gridcolor="lightgray",
+        showline=True,
+        linewidth=1,
+        linecolor='black',
+        mirror=True,
+        # Show  y axis horizonal line.
+        showspikes=True,
+        spikecolor="green",
+        spikethickness=1                        
+                      )
+
     
     # Adjust the axes tick marks.
-       # Since the range of prevalences on the xaxis varies we have
+       # Since the range of prevalences on the x axis varies we have
        # to vary the tick frequency on the xaxis. 
     XtickIncrement = (G.PrevEnd - G.PrevStart) / 10
     G.Fig1.update_layout(xaxis = dict(tickmode = 'linear',
@@ -975,17 +1027,8 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
     G.Fig1.update_layout( yaxis = dict(tickmode = 'linear',
                           tick0 = 0, dtick = 0.1))
         
-    # Add border around the plot. #,ivory,linen,mintcream,snow,whitesmoke
-    G.Fig1.update_layout(
-        margin=dict(l=10, r=10, t=30, b=30), paper_bgcolor="mintcream", ) 
-    G.Fig1.update_xaxes(showline=True,  linecolor='black', mirror=True)
-    G.Fig1.update_yaxes(showline=True, linewidth=1, linecolor='black', mirror=True)
-    
-    # Add a documentation text box to the plot.
-    #  This works if you make the plot area big enough to put the
-    #  document box under the plot. (See width/height above.)
-    #  But if we don't autosize the plot it won't adjust to different size
-    #  screens. So we avoid any feature that sets absolute size for anything.
+
+    # Add a documentation text box to the plot. Place near the legend.
     layoutojb=go.Layout(
         annotations=[
             go.layout.Annotation(
@@ -1001,89 +1044,19 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
                 bordercolor="black",
                 borderwidth=1)])
     G.Fig1.update_layout(layoutojb)
-    # G.Fig1.add_annotation(
-    #     text=Plot_Report_Build(formatfor="html"), 
-    #         align="left",
-    #         showarrow=False,
-    #         xref="paper", yref="paper",
-    #         x= 1.0, xanchor = "left",
-    #         y= 0.25, yanchor = "bottom",
-    #         bordercolor="black", borderwidth=0)
-   
 
-    
-    ###########################################################################
-    #  CREATE FIGURE 2:  THE ABSOLUTE NUMBER OF POSITIVES AND NEGATIVES
-    ###########################################################################
-         
-    G.Fig2 = go.Figure() # Create an empty Plotly figure.
-    
-    G.Fig2.add_trace(go.Scatter(
-        name="True Positive",
-        text="True Positive",
-        legendrank=6,
-        x=G.DataTable["Prevalence"], y=G.DataTable["TP"], 
-        visible=True,
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="black")  ))
-    
-    G.Fig2.add_trace(go.Scatter(
-        name="False Positive",
-        text="False Positive",
-        legendrank=6,
-        x=G.DataTable["Prevalence"], y=G.DataTable["FP"], 
-        visible="legendonly",
-        mode="lines",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="black")  ))
 
-    G.Fig2.add_trace(go.Scatter(
-        name="True Negative",
-        text="True Negative",
-        legendrank=8,
-        x=G.DataTable["Prevalence"], y=G.DataTable["TN"], 
-        visible=True,
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="peru" ) ))    
-
-    G.Fig2.add_trace(go.Scatter(
-        name="False Negative",
-        text="False Negative",
-        legendrank=8,
-        x=G.DataTable["Prevalence"], y=G.DataTable["FN"], 
-        visible="legendonly",
-        xhoverformat= x_hoverformat,
-        yhoverformat= y_hoverformat,
-        line=dict(color="peru" ) ))
-    
-    PlotTitle = "<b>Screening Test:   Claimed Absolute Numbers."
-    
-    G.Fig2.update_layout(
-        title=PlotTitle,
-        title_x=0.4,
-        xaxis_title="<b>Disease Prevalence In Population",
-        yaxis_title="<b>Claimed Absolute Number Of Response Variable")
-    
-    G.Fig2.update_layout(xaxis = dict(tickmode = 'linear',
-                         tick0 = G.PrevStart, dtick = XtickIncrement))
-  
     return() # End of function:   Plot_Build()
 
 def Plot_Report_Build(formatfor="regular"):
 
     if  formatfor == "streamlit": 
         ind = " -- " 
-        eol =   ".  \r"  # ". \u000D"
     elif formatfor == "html":
         ind = " - "
-        eol = ".  \r"   
     else: 
         ind = " - "
-        eol = ".  \r"
+
         
     header = "**REPORT ON YOUR SCREENING TEST** "
     if G.UsersReportAnnotation == None \
@@ -1110,10 +1083,10 @@ def Plot_Report_Build(formatfor="regular"):
        ind + "The false positive rate varies "                               +
               f"from {G.PrevStartFPR:.5f} to {G.PrevEndFPR:.5f}.   \n"       +
        ind + "The false negative rate varies "                               +
-             f"from {G.PrevStartFNR:.5f} to {G.PrevEndFNR:.5f}.   \n"        + 
-             f"\n** At The Prevalence Of Interest = {G.PrevInt:.6f}. **   \n" + 
+            f"from {G.PrevStartFNR:.5f} to {G.PrevEndFNR:.5f}.   \n"         + 
+            f"\n** At The Prevalence Of Interest = {G.PrevInt:.6f}. **   \n" + 
        ind + f"About {G.PrevInt_FPPercent:.2f} "                             +
-              "of all positives are false.  \n"                               + 
+             "of all positives are false.  \n"                               + 
        ind + f"About {G.PrevInt_FNPercent:.2f} "                             + 
               "of all negatives are false.  \n"                              +      
        ind + f"Positive Predictive Value (PPV) = {G.PrevInt_PPV :.4f}.   \n" +
@@ -1274,7 +1247,105 @@ def Static_Variables_Create():
     S.Dialog_State = 0    # Create session Dialog_State variable.
     return() # End of function: Static_Variables_Create
 
+def Plot_Figure2(): # Not used    
+    ###########################################################################
+    #  CREATE FIGURE 2:  THE ABSOLUTE NUMBER OF POSITIVES AND NEGATIVES
+    ###########################################################################
+         
+    G.Fig2 = go.Figure() # Create an empty Plotly figure.
+    
+    G.Fig2.add_trace(go.Scatter(
+        x=G.DataTable["Prevalence"],
+        y=G.DataTable["TP"], 
+        name="True Positive Claimed",
+        text="True Positive Claimed",
+        hovertemplate="<br>" + "Prev=%{x}, " + "True Positive Claimed=%{y}  <extra></extra>",
+        hoverinfo="name",
+        hoverlabel=dict(font_size=12,bgcolor="black"),
+        xhoverformat= ".4f",
+        yhoverformat= ".4f",
+        legendrank=6,
+        visible=True,
+        mode="lines",
+        line=dict(color="black")  ))
+    
+    G.Fig2.add_trace(go.Scatter(
+        x=G.DataTable["Prevalence"], 
+        y=G.DataTable["FP"],
+        name="False Positive",
+        text="False Positive",
+        hovertemplate="<br>" + "Prev=%{x}, " + "False Positive=%{y}  <extra></extra>",
+        hoverinfo="name",
+        hoverlabel=dict(font_size=12,bgcolor="brown"),
+        xhoverformat= ".4f",
+        yhoverformat= ".4f",
+        legendrank=6,
+        visible="legendonly",
+        mode="lines",
+        line=dict(color="brown")  ))
 
+    G.Fig2.add_trace(go.Scatter(
+        x=G.DataTable["Prevalence"], 
+        y=G.DataTable["TN"], 
+        name="True Negative",
+        text="True Negative",
+        hovertemplate="<br>" + "Prev=%{x}, " + "True Negative=%{y}  <extra></extra>",
+        hoverinfo="name",
+        hoverlabel=dict(font_size=12,bgcolor="peru"),
+        xhoverformat= ".4f",
+        yhoverformat= ".4f",
+        legendrank=8,
+        visible=True,
+        line=dict(color="peru" ) ))    
+
+    G.Fig2.add_trace(go.Scatter(
+        x=G.DataTable["Prevalence"],
+        y=G.DataTable["FN"], 
+        name="False Negative",
+        text="False Negative",
+        hovertemplate="<br>" + "Prev=%{x}, " + "False Negative=%{y}  <extra></extra>",
+        hoverinfo="name",
+        hoverlabel=dict(font_size=12,bgcolor="blue"),
+        xhoverformat= ".4f",
+        yhoverformat= ".4f",
+        legendrank=8,
+        visible="legendonly",
+        line=dict(color="blue" ) ))
+    
+    PlotTitle = "<b>Screening Test:   Claimed Absolute Numbers."
+    
+    G.Fig2.update_layout(
+        title=PlotTitle,
+        title_x=0.4,
+        xaxis_title="<b>Disease Prevalence In Population",
+        yaxis_title="<b>Claimed Absolute Number Of Response Variable")
+    
+    # Adjust the axes tick marks.
+       # Since the range of prevalences on the x axis varies we have
+       # to vary the tick frequency on the xaxis. 
+    XtickIncrement = (G.PrevEnd - G.PrevStart) / 10
+    G.Fig2.update_layout(
+        xaxis = dict(tickmode = 'linear',
+        tick0 = G.PrevStart,
+        dtick = XtickIncrement))
+    
+    # Place  Figure 2 on the GUI.
+    st.plotly_chart(G.Fig2, 
+                    use_container_width=True, 
+                    config={'displayModeBar': True}, # Force plotly toolbar.
+                    sharing="streamlit")
+    
+    # Add button to download Fig2 as an independent interactive hmtl page.
+    PlotAsInteractiveHTML=plotly.io.to_html(G.Fig2)
+    st.download_button(
+        label="👇 Download Interactive Plot", 
+        data=PlotAsInteractiveHTML, 
+        file_name=G.Fig2_Download_FileName, 
+        mime= "text/html",
+        key="Fig2DownloadPlot", 
+        help="Download the plot as an independent interact html page.")
+    
+    return()  # End of function" Plot_Figure2()
 
 MainLine()   # Start this program.
 
