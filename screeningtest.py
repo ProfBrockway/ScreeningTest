@@ -39,7 +39,6 @@ import plotly.graph_objects as go
 
 from io import BytesIO
 
-
 class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
     # +++ DETAILS ABOUT THIS MODULE
@@ -382,7 +381,6 @@ def GUI_Build_Vertical_Menu():        # Build the GUI.
     Form1 = st.sidebar.form(key="Form1", clear_on_submit=False)
 
     with Form1:
-
         
         # Create a textbox for displaying instructions and error messages.
         st.text_area(
@@ -647,13 +645,15 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
     
     ###########################################################################
     # +++ SHOW A WEB SITE WHERE COVID PREVALENCE IS CHARTED.
-  
-    with st.expander("📽 **A WEBSITE CHARTING PREVALENCE OF COVID 19**"):
+ 
+    with st.expander("📽 ** PREVALENCE OF COVID 19 (Johns Hopkins University)**"):
         st.info(
+         "Source +++ Johns Hopkins University +++  \r   "
+         "    \r"
          "Please see this program's documentation for a discussion of "
          "prevalence.  \r" 
-         "The McKinsey website below claims to report the prevalence of Covid " 
-         "19 in the USA for the past elapsed year.  "
+         "The McKinsey/Johns Hopkin website below claims to report the " 
+         "prevalence of Covid 19 in the USA for the past elapsed year.  "
          "https://covid-tracker.mckinsey.com/prevalence  \r"
          "Prevalence is reported as less than 1% for 10.5 months!   \r"
          "As of 4/13/2022 prevalence is reported at 0.14%.   \r"
@@ -661,19 +661,20 @@ def GUI_Right_Panel_Build():  # Put the plot etc in the GUI right panel.
          "of active COVID-19 cases in a state as a percentage of the "
          "state's population. A COVID-19 case is counted as active "
          "during the 14 days after it is confirmed.'  \r"
-         "The McKinsey website is also embedded in this web page below.  \r" 
-               ) 
-        # Show an embedded web site. 
+         "The 'Prevalence' website is also embedded in this web "
+         "page below. \r" ) 
+
+        # Show the website page embedded in our web page.  
         st.write("""<iframe 
                  src="https://covid-tracker.mckinsey.com/prevalence" 
-                 width="1000" height="600" allowfullscreen=""
+                 width="1000" 
+                 height="600" 
+                 allowfullscreen=""
                     >
                </iframe>""",
                unsafe_allow_html=True)
-    
-    
+        
    
-    
     return  # End of function: GUI_Right_Panel_Build
 
 def GUI_HelpMenu_Build():
