@@ -43,7 +43,7 @@ class Global_Variables():  # A class creating all global variables.
     ###########################################################################    
     # +++ DETAILS ABOUT THIS MODULE
     ThisModule_Project = "Medical Screening Tests Efficacy."
-    ThisModule_Version = "7_03   2022 March 9."  
+    ThisModule_Version = "7_05   2022 April 27."  
     ThisModule_About = "For a course Spring 2022. "  
     ThisModule_Author = "TB, UConn Math Dept."
     ThisModule_Purpose = ("To demonstrate the effect of disease prevalence " 
@@ -213,7 +213,6 @@ class Global_Variables():  # A class creating all global variables.
     Plot2 = None
     Msg01 = "Enter the parameters of the medical screening test "\
             "and click 'Plot Now' button."
-    
     Plot_Report = None
 
 # End of Global Variables
