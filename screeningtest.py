@@ -23,7 +23,7 @@
 #           How To Run This Program On A Development Computer. 
 #  - To test the app on a local (undeployed) server and see our web page
 #    locally, enter the following command in the Anaconda console.
-#  
+#  streamlit run "G:\My Drive\UConn\1-Subjects\Python\STAT476\CODE\ScreeningTest\screeningtest.py"
 ###############################################################################
 
 import os
@@ -624,8 +624,8 @@ def Plot_Generate_Data():
 
     # Create the X axis tick values.
     # The x ticks reflect the denser values near the low prevelence values. 
-    G.XTickVals = [val/100 for val in range(0,600,5)] + [val for val in range(6,100,2)]
-
+    # G.XTickVals = [val/100 for val in range(0,600,5)] + [val for val in range(6,101,2)]
+    G.XTickVals = [val/100 for val in range(0,600,10)] + [val for val in range(6,101,2)]
     # Process each of the Prev's in the list of Prev's to be tested.
     # The stats for each prev are calculated and stored in a table row.
     G.DataTable = G.DataTable[0:0] # Clear the DataTable. Retain its structure.
@@ -690,7 +690,7 @@ def Plot_Generate_Data():
         G.FNPercent =  100 - G.NPV
             
         # ACC: The 'General' Accuracy: = ((TP + TN)) / Pop
-        G.Acc = (G.TP + G.TN) / G.PopSize
+        G.Acc = ( (G.TP + G.TN) / G.PopSize ) * 100
         
         # Add the stats for the Population Prevalence we have just processed
         # to our results table, DataTable if required.
@@ -762,7 +762,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       y=G.DataTable["FPPercent"], 
       name="False Positive Percentage", # Shows in Legend.
       text="False Positive Percentage", # Shows in Hovertext.
-      hovertemplate="<br>" + "Prev=%{x}%, " + "False Positive Percentage=%{y}%  <extra></extra>",
+      hovertemplate="<br>" + "Prev=%{x}%. " + "False Positive Percentage=%{y}%  <extra></extra>",
       hoverinfo="text",
       hoverlabel=dict(font_size=12,bgcolor="red"),
       xhoverformat= ".4f",
@@ -777,13 +777,13 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       y=G.DataTable["PPV"], 
       name="Positive Predictive Value",   
       text="Positive Predictive Value",  
-      hovertemplate="<br>" + "Prev=%{x}%, " + "Positive Predictive Value=%{y}%  <extra></extra>",
+      hovertemplate="<br>" + "Prev=%{x}%. " + "Positive Predictive Value=%{y}%  <extra></extra>",
       hoverinfo="name",
       hoverlabel=dict(font_size=12,bgcolor="green"),
       xhoverformat= ".4f",
       yhoverformat= ".4f",
       legendrank=2,
-      visible=True,
+      visible=False,
       mode="lines",
       line=dict(color="green"  )   ))
    
@@ -792,7 +792,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       y=G.DataTable["FNPercent"],
       name="False Negative Percentage",
       text="False Negative Percentage",
-      hovertemplate="<br>" + "Prev=%{x}%, " + "False Negative Percentage=%{y}%  <extra></extra>",
+      hovertemplate="<br>" + "Prev=%{x}%. " + "False Negative Percentage=%{y}%  <extra></extra>",
       hoverinfo="name",
       hoverlabel=dict(font_size=12,bgcolor="blue"),
       xhoverformat= ".4f",
@@ -807,7 +807,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       y=G.DataTable["NPV"], 
       name="Negative Predictive Value",
       text="Negative Predictive Value",
-      hovertemplate="<br>" + "Prev=%{x}%, " + "Negative Predictive Value=%{y}% <extra></extra>",
+      hovertemplate="<br>" + "Prev=%{x}%. " + "Negative Predictive Value=%{y}% <extra></extra>",
       hoverinfo="name",
       hoverlabel=dict(font_size=12,bgcolor="magenta"),
       xhoverformat= ".4f",
@@ -822,13 +822,13 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       y=G.DataTable["ACC"],
       name="General Accuracy",
       text="General Accuracy",
-      hovertemplate="<br>" + "Prev=%{x}%, " + "General Accuracy=%{y}%  <extra></extra>",
+      hovertemplate="<br>" + "Prev=%{x}%. " + "Claimed 'General Accuracy'=%{y}%  <extra></extra>",
       hoverinfo="name",
       hoverlabel=dict(font_size=12,bgcolor="orange"),
       xhoverformat= ".4f",
       yhoverformat= ".4f",
       legendrank=9,
-      visible="legendonly",
+      visible=True, # "legendonly" to hide on graph.
       mode="lines",
       line=dict(color="orange")  ))
     
@@ -841,7 +841,8 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
       yaxis_title="<b>Response Of The Screening Test",
       plot_bgcolor = "white",
       paper_bgcolor="mintcream",
-        
+      showlegend=True,
+      
       # Add border around the plot. #,ivory,linen,mintcream,snow,whitesmoke
       margin=dict(l=10, r=10, t=30, b=30), 
         
@@ -859,8 +860,8 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
                   # Make the legend transparent.
                   bgcolor="rgba(0,0,0,0)", 
                   bordercolor="Black",
-                  x= 1.00, xanchor = "left",
-                  y= 0.55, yanchor = "bottom",
+                  # x= 1.00, xanchor = "left",
+                  # y= 0.55, yanchor = "bottom",
                   borderwidth=1) 
          
     )  # end of G.Fig1.update_layout(
