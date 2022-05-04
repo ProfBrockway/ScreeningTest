@@ -860,7 +860,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
                   # Make the legend transparent.
                   bgcolor="rgba(0,0,0,0)", 
                   bordercolor="Black",
-                  # x= 1.00, xanchor = "left",
+                  x= 1.00, xanchor = "left",
                   # y= 0.55, yanchor = "bottom",
                   borderwidth=1) 
          
@@ -920,6 +920,7 @@ def Plot_Build(): # Create our plot using Plotly Graph Objects.
             go.layout.Annotation(
                 text=Plot_Report_Build(formatfor="html"),
                 align="left",
+                font=dict(size=10),
                 showarrow=False,
                 xref="paper",
                 yref="paper",
@@ -960,14 +961,14 @@ def Plot_Report_Build(formatfor="regular"):
              "from 0% to 100%.   \n"                                         +
        ind + f"Test Sensitivity = {G.Sens:.4f}%.   \n"                       +
        ind + f"Test Specificity = {G.Spec:.4f}%.   \n"                       +
-       ind + f"Plot Prevalence Start = {0:.5f}%.   \n"                       +
-       ind + f"Plot Prevalence End = {100:.5f}%.   \n"                       +
-       ind + f"Population = {G.PopSize:.0f}.   \n"                           +
-             "\n** The range of false results. **   \n"                      +
-       ind + "The false positive rate varies "                               +
-              f"from {G.PrevStartFPR:.5f}% to {G.PrevEndFPR:.5f}%.   \n"     +
-       ind + "The false negative rate varies "                               +
-            f"from {G.PrevStartFNR:.5f}% to {G.PrevEndFNR:.5f}%.   \n"       + 
+    #  ind + f"Plot Prevalence Start = {0:.5f}%.   \n"                       +
+    #  ind + f"Plot Prevalence End = {100:.5f}%.   \n"                       +
+    #  ind + f"Population = {G.PopSize:.0f}.   \n"                           +
+    #        "\n** The range of false results. **   \n"                      +
+    #  ind + "The false positive rate varies "                               +
+    #        f"from {G.PrevStartFPR:.5f}% to {G.PrevEndFPR:.5f}%.   \n"     +
+    #  ind + "The false negative rate varies "                               +
+    #        f"from {G.PrevStartFNR:.5f}% to {G.PrevEndFNR:.5f}%.   \n"       + 
             f"\n** At The Prevalence Of Interest = {G.PrevInt:.6f}%. **   \n" + 
        ind + f"About {G.PrevInt_FPPercent:.2f}% "                            +
              "of all positives are false.  \n"                               + 
